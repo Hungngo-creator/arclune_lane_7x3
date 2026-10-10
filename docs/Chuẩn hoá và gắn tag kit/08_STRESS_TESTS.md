@@ -1,6 +1,6 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-10-I.27
+**Version:** 2026-10-10-I.28
 **Status:** Working Canonical Validation Suite  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md` B.4+, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.23+, `05_CONTRACTS.md` F.25+, `06_KERNEL_RUNTIME.md` G.24+, `07_MODE_PROFILES.md` H.2+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
@@ -55,6 +55,8 @@
 **Revision I.26:** adds only M-195–M-197 for conserved fraction-to-TRUE splitting, actual-recipient/source-family phase reads with sequential State settlement, and overlap/provenance/replay rejection. Diệp Lâm's other mechanics reuse existing cases/Contracts with explicit Canon validation fixtures. Earlier case bodies/IDs remain unchanged; no guessed Fear/Bleed behavior or executable test results.
 
 **Revision I.27:** adds M-198–M-207 for conditional River lifecycle/capture, strict pre-Action selection, observed-versus-restorable AE/Rage hard exclusion, same-life/atomic layout, receipt-backed partial refund, created-entity History cause, Sa/CC/opportunity clocks, replacement palms and finite Forced Basics/Ultimate replay. Rejection controls cover unsupported rollback/profile writes; all previous case bodies/IDs remain unchanged. Declarative Architecture Phase obligations, not executed runtime tests.
+
+**Revision I.28:** adds18 foundation/cross-Axiom cases N-010–N-027 covering explicit residency/traits, finite Heavenly baseline/checkpoint/strike law, bound-True-Self lineage/default exit, Unique claims/Deck retention and Divinity negative space. Latest designer locks Heavenly start read before expiry/start settlements. Only J-002/META-005 prior bodies change to remove superseded Exploration disablement; PR #48 History cases remain exact. Declarative Architecture Phase coverage, no executable test claim.
 
 # 0. WHAT THIS FILE IS
 
@@ -1390,16 +1392,16 @@ The only proposed solution is bespoke Character runtime code.
 
 ---
 
-## J-002 — Reincarnation Disabled in Exploration
+## J-002 — Resident Reincarnation With Required Exploration Adapter
 
 **ID:** `J-002`  
-**Status:** `MUST_REJECT`  
-**Purpose:** lifecycle feature flag.  
-**Initial State:** Exploration/Defense profile.  
-**Input:** ordinary mode Ability attempts turn-based `REINCARNATION` lifecycle operation without special supported system.  
-**Expected Resolution:** mode-incompatible semantic rejected.  
-**Forbidden Outcomes:** secretly run turn-based Luân Hồi ledger.  
-**Layers Under Test:** Mode Profile.
+**Status:** `MUST_PASS residency / MUST_REJECT unsupported operation`
+**Purpose:** newest designer residency correction supersedes Mode disablement.
+**Initial State:** real Exploration/Defense Combat Instance without SSI, Luân Hồi/Thiên Lôi ALWAYS_RESIDENT.
+**Input:** valid bound-True-Self death/cohort under shared semantic commits; variant Ability requests unsupported turn-based scheduling without explicit Mode adapter.
+**Expected Resolution:** World registry/eligible death bookkeeping remains resident; unsupported scheduling operation rejects affected content with REQUIRED_EXPLICIT adapter. No fabricated real-time waiting clock.
+**Forbidden Outcomes:** disable Luân Hồi/ledger because no SSI; no-bound body waiting; silent turn→seconds translation or second lifecycle subsystem.
+**Layers Under Test:** H.5, INS-003/REC, Mode validation.
 
 ---
 
@@ -5221,6 +5223,171 @@ Any refund requires its own explicit refund Contract/policy.
 
 ---
 
+## N-010 — Explicit World Residency, Trait Family and Rank Negative Space
+
+**ID:** `N-010`
+**Status:** `MUST_PASS / MUST_REJECT invalid profiles`
+**Purpose:** distinguish Combat/System laws, identity Traits and dependency/access after PR #48.
+**Fixture/input:** real Main/Arena/Exploration instances with no History-dependent content; variant Lậu Khắc only in Deck; dynamic History capability at checkpoint K. Definitions explicitly author DIVINE_NATURE/UNIQUENESS or are plain Prime. Invalid variants omit future World residency, attach World law as Trait, infer UR/Prime access or promote interacting Ability tier.
+**Expected Resolution:** Luân Hồi/Thiên Lôi registered ALWAYS_RESIDENT in every real instance. River absent without dependency; Deck variant imports before gameplay; dynamic variant baseline starts only at K and persists after access Character leaves/dies. Traits supply identity policies, no World registration. Plain Prime receives no Divinity/access/AXIOM Ability. Invalid family/residency/inference rejects. Existing M-198–M-207 provider/capture/AE-Rage invariants remain.
+**Forbidden Outcomes:** blanket resident River; World-system Character owner; trait registration as subsystem; new Functional Tags/Primitive/Character manager; duplicated dependency/History runtime.
+**Layers Under Test:** 00/01, E.25, INS-003/AUT-005/HIS, Registry/Combat Instance, Mode.
+
+## N-011 — Heavenly Tracked Stat Metadata, Equality and Complete Cause Set
+
+**ID:** `N-011`
+**Status:** `MUST_PASS / MUST_REJECT invalid basis`
+**Fixture/input:** eligible Field life with static baseline100 for each profile-tracked positive stat and actual effective349/350/400. Profile metadata marks HP-capacity/ATK/WIL/ARM/RES scaled, SPD unscaled. Variant ATK350 alone; ATK/WIL350 and ARM400 together; SPD900 alone. Test numerator HP capacity350 with CurrentHP1. Invalid baseline0/non-finite or missing tracked binding.
+**Expected Resolution:**3.49× legal; exactly3.5× qualifies. Any one tracked cause suffices; several causes at the same committed checkpoint produce one strike with complete typed cause set. Unscaled SPD ignored. HP uses CurrentMaxHP, not CurrentHP; no hardcoded per-Character switch. Invalid denominator/metadata rejects or requires explicit supported profile before execution, no divide-zero semantics.
+**Forbidden Outcomes:** strict> instead of>=; +350% interpretation; one strike per stat; CurrentHP stat ratio; scenery hp or stale executable stat table treated as authority.
+**Layers Under Test:** Stat metadata/Snapshot, 04§32.5, INS-003, finite observation transaction.
+
+## N-012 — Heavenly Rage Predicate Requires an Actual Provider
+
+**ID:** `N-012`
+**Status:** `MUST_PASS`
+**Fixture/input:** otherwise legal tracked stats; one Actor no Rage resource, one enabled MaxRage50, one enabled51. A stable transaction changes enabled MaxRage51→50 and several tracked stats→threshold.
+**Expected Resolution:** no-Rage contributes no cause;50 qualifies,51 does not. Mutation crossing creates one immediate strike with Rage and all qualifying stat causes. Current Rage/full-readiness does not replace MaxRage predicate.
+**Forbidden Outcomes:** missing resource=0; several causes produce several strikes; resource mutation mislabeled State so Divinity blocks world observation.
+**Layers Under Test:** Resource/provider schema, INS-003, committed checkpoint.
+
+## N-013 — Heavenly Stable Checkpoints, Natural Start Before Expiry and Dedup
+
+**ID:** `N-013`
+**Status:** `MUST_PASS`
+**Fixture/input:** materialize already violating; a separate atomic two-stat mutation enters violation; persistent violator then receives normal and CC-lost owner Natural opportunities, a Forced/Follow-up/Counter/Reaction, leave and violating reentry. Variant violates only via Buff expiring at owner-start; variant starts legal then ACT-034/start mutation crosses threshold. Re-deliver same checkpoint and save before observation/strike/counter commit.
+**Expected Resolution:** one immediate strike at materialization and one at each distinct qualifying stable crossing/reentry. No read/strike between the atomic transaction's staged stat writes. Persistent violation receives one periodic strike at every owner Natural start, including CC loss. **Latest designer lock:** Heavenly reads before State expiry/start settlements; expiring-Buff variant gets its start strike, then expiry becomes legal with no further strike. Legal-start variant has no periodic strike but later committed crossing has its own immediate strike. Non-Natural actions/pass contacts/POSTMORTEM_WAIT create no periodic strike. Absent Field pauses, legal state pauses periodic work, reentry violating strikes without reset. One subject/checkpoint terminal identity dedups overlapping reasons/save/replay.
+**Forbidden Outcomes:** polling/frame strikes; CC bypass; tick after Action only; expired State read first; child checkpoint treated as Natural; duplicate counter/Damage; iteration order as checkpoint identity.
+**Layers Under Test:** INS-003, ACT-034/CLK, existing System/Transaction/Scheduler, H.5.
+
+## N-014 — Heavenly Immutable True-Self Baseline and Counter Across Bodies
+
+**ID:** `N-014`
+**Status:** `MUST_PASS`
+**Fixture/input:** True Self T first static basis B100 after static Rank/Star/progression before temporary+100% Buff. T receives3 committed strikes, then Revive/Return/redeploy/transformation and a new Reincarnation body with tracked stat400 and Shield500. Empty body E has own positive static record/count2; later binds T. Separate no-True-Self Damage-valid Summon/Puppet has its own actor/life record and violations. Shared parts project one life owner with one delegated real Natural opportunity.
+**Expected Resolution:** T baseline remains100 throughout, never200/400. Count survives death/waiting/new life; new body400>=350 violates immediately, next strike#4 bypasses Shield untouched. E binding switches to T record, does not merge/reset E count2/basis; first True Self without existing record uses resolved static profile. Unbound actor can be struck with its actor/life baseline. Parts do not duplicate baseline/strikes; each actual delegated owner opportunity has one periodic checkpoint. Terminal absent T gets no strikes.
+**Forbidden Outcomes:** new body/new life fresh baseline/count; Buff/Revive/leave/legal interval reset; body-only record overrides T; soul fabrication for Summon; three parts three strikes for one checkpoint.
+**Layers Under Test:** Identity/provider/Snapshot, INS-003/ENT-023/REC, existing instance subject records.
+
+## N-015 — Heavenly Fixed20%, Ordinary Mitigation Denial and Shield Ordinals
+
+**ID:** `N-015`
+**Status:** `MUST_PASS`
+**Fixture/input:** eligible violation, CurrentMaxHP1000/HP1000, Shield contribution ledger500. Replay independent ordinal1/2/3/4 fixtures with retained subject count; activate ordinary ARM/RES, penetration, FDR/scoped take-less/ALL_DAMAGE receive50%, cap1, outgoing amplification, evasion, taunt, target/Damage redirection and lower-tier immunity. No explicit AXIOM conflict.
+**Expected Resolution:** every ordinal requests exactly200 TRUE Damage from current MaxHP, independent of count and ordinary modifiers. Ordinal1–3 permits ledger absorption200: HP1000, remaining Shield300 and count+1;100%absorption still increments. Ordinal4 commits HP800 and Shield500 unchanged, no split/consume/deplete/Shield-depleted event. If current MaxHP changes to1500 before a distinct strike checkpoint, new request300.
+**Forbidden Outcomes:**20/40/60% escalating Damage; mitigation/cap/miss/redirect reducing/moving hit; Shield4 depleted; denominator using baseline/source MaxHP; AXIOM_TRUE_DAMAGE Tag or fourth Damage pipeline.
+**Layers Under Test:** INS-003, DMG/Authority/SHP/Result/Transaction, finite ordinal policy.
+
+## N-016 — Heavenly Eligible Domain, Divinity and Death Prevention
+
+**ID:** `N-016`
+**Status:** `MUST_PASS / MUST_REJECT unsupported conflict`
+**Fixture/input:** both-Side Characters, Leader, Summon, Puppet and other Damage-valid HP unit violate; Prime with/without Divinity violates. Scenery has numeric hp but no Damage-valid profile. Lethal Heavenly strike reaches HP_ZERO with eligible ordinary Death Prevention. Future external AXIOM anti-strike clause has unresolved System adjudication inputs.
+**Expected Resolution:** all eligible units including Leader/Prime/Divinity are struck without Side bias; scenery not admitted. Real Damage receipts use World source/cause, no caster/Character Action or fabricated ACTION_GENERATED class-resource grant; normal Damage observers and any valid DAMAGE_RECEIVED grants retain their own cause/admission law. HP_ZERO→ordinary prevention; successful prevention leaves alive and retains committed strike count, no repeated Damage/confirmed death. Future equal-AXIOM conflict uses AUT on exact clauses; missing System profile rejects affected content rather than fake Prime/infinity tier.
+**Forbidden Outcomes:** Divinity Damage immunity; Leader exemption; scenery targeted by numeric hp alone; cannot-save/ERASE; ordinary reduction hidden inside prevention; comparison by target Rank against an invented Character system owner.
+**Layers Under Test:** eligibility/providers, INS-003/STA-011/AUT/DTH, Damage/lifecycle ownership.
+
+## N-017 — Reincarnation Iron Binding Law and Borrowed Body
+
+**ID:** `N-017`
+**Status:** `MUST_PASS`
+**Fixture/input:** DEATH_CONFIRMED A bound valid T; B empty collection Character; E originally empty then receives U; F loses V binding before death. Controls NPC/Puppet/Summon with or without authoritative valid binding; unbound body with explicit own replacement/Revive entitlement.
+**Expected Resolution:** A/E and other qualifying bound lives register exact T/U waiting/cohort lineage record. B/F/no-binding controls never waiting/cohort-progress/lineage candidate, no fake soul. Current death-checkpoint binding decides, not birthplace/collection identity. Without another admitted entitlement body terminally exits; explicit other recovery follows its own policy without routing through Luân Hồi.
+**Forbidden Outcomes:** NPC/mode implicit no-soul exception; empty death increments progress; bound soul removed after snapshot still treated bound at death; universal no-True-Self invulnerability or cancellation of explicit replacement.
+**Layers Under Test:** REC-002/P-064/identity/death, Kenoma/Pygmalion controls, lifecycle.
+
+## N-018 — Reincarnation Entry, Waiting Race and No-route Default
+
+**ID:** `N-018`
+**Status:** `MUST_PASS`
+**Fixture/input:** A at3/4; later qualifying cohort commits; ordinary queued Revive(A). Control Revive commits before later death. Actual entry has no eligible in-combat host/rebirth/capture/route; separate valid route variant. Reuse live threshold/base contribution fixtures M-103–M-109/M-126–M-132.
+**Expected Resolution:** mandatory cohort/ledger/threshold before ordinary reactions; A enters and old-life ordinary Revive fails. Prior committed Revive closes its current waiting/candidate and later cohort does not advance it. No-route entry exits True Self from encounter, no random/new Character; eligible route uses existing contention/host/pool/reservation law. Base4/current reductions/contributions/all-entry/cohort semantics remain intact, not wall-clock.
+**Forbidden Outcomes:** queued ordinary Revive outruns mandatory ledger; automatic new body just because World law exists; dead cohort members count each other; default exit ERASES lore identity or invents limbo route.
+**Layers Under Test:** REC-001/004/005/006/020, existing ledger/Lifecycle, regression references.
+
+## N-019 — Previous-life Basis Without River and Transient Filtering
+
+**ID:** `N-019`
+**Status:** `MUST_PASS / MUST_REJECT incomplete profile`
+**Fixture/input:** River absent. T's static Rank-Multiplied ATK100; profile-qualified battle-persistent inheritable growth+20; temporary Buff+120 and Field modifier+60. Current effective300. At qualifying death capture lineage candidate; later external State mutations cannot rewrite it. Bind an explicit50% previous-stat route.
+**Expected Resolution:** default inheritance basis ATK120, requested inherited ATK60, not150/300; include only explicit inheritable persistent+20, exclude transient+120/+60. Record exact trueSelfId/lifeSerial/deathRecord/provenance/profile once. No CurrentHP/AE/Rage/Shield/State object/CD/duration/temp form copy; no double Rank scaling. World record exists with no River import. Missing finite stat/inheritable/exception policy rejects affected route.
+**Forbidden Outcomes:** temporary+100% baked permanently; unmarked persistent contribution inherited implicitly; require River/P-120 marker; full effective-stat/state clone.
+**Layers Under Test:** 04§31.2/inheritance.statPolicy, REC-005/Stat/Snapshot/lineage.
+
+## N-020 — Lineage Candidate Retirement/Sealing and Existing Consumer Profiles
+
+**ID:** `N-020`
+**Status:** `MUST_PASS`
+**Fixture/input:** death record D1 creates candidate C1; ordinary Revive succeeds before entry, then later same-lifeSerial death D2 creates C2. Variant Revive fails, or actual entry seals C2; replay old death/entry delivery. An explicitly authored transient-inheritance exception is a separate profile. Audit Luân Hồi Chi Chủ30/50/70% route, Pygmalion host/creator snapshot and Kenoma host-only binding; special Ký Ức ordinary-Revive death snapshot.
+**Expected Resolution:** successful Revive retires C1 with waiting; failure does not. Actual D2 entry seals only C2; retired/inactive C1 cannot promote, replay cannot capture/promote twice. Explicit finite exception affects only its own inherited scope. Luân Hồi Chi Chủ may bind default lineage with exact stat list still required; fractions unchanged. Pygmalion keeps its own host/creator basis (including explicit later creator-current snapshot), Kenoma keeps host stats/no previous-life inheritance; Ký special Revive keeps explicit death snapshot.
+**Forbidden Outcomes:** key only trueSelfId/lifeSerial merging D1/D2; fresh entry consumes archived C1; silently changing existing Character inheritance; ordinary Revive treated as Reincarnation; River required or lineage rewind.
+**Layers Under Test:** REC/REV/IDN, basis lifecycle/transactions/replay, exact consumer canon audit.
+
+## N-021 — Unique Deck Non-claim, First Commit and Authoritative Ordering
+
+**ID:** `N-021`
+**Status:** `MUST_PASS / MUST_REJECT unordered requests`
+**Fixture/input:** both Sides have same UNIQUENESS identity Lậu Khắc in one of four Deck slots, no holder. Authoritative request order A then B; reverse valid order control. Shuffle Entity IDs, Slots, list/dictionary and Event delivery without changing request order.
+**Expected Resolution:** neither Deck membership claims. First successful materialization acquires; next blocked deploy leaves its exact card/slot/capacity occupied, no payment/presence claim commit, reroll/replace/Character change. After real release, later B request deploys if other conditions legal. Winner changes only with authoritative request/transaction order, not enumeration. Unsupported unordered incompatible requests require explicit ordering instead of fake tie-break.
+**Forbidden Outcomes:** Deck setup first-list claim; Slot/Entity/Event priority; charge then fail; new global Deck reroll.
+**Layers Under Test:** axiomIdentities/uniquenessIdentity, ENT-021/022/DEP, validator/transaction/Deck.
+
+## N-022 — Unique Claim Retention, Actual Reincarnation and Atomic Continuation
+
+**ID:** `N-022`
+**Status:** `MUST_PASS`
+**Fixture/input:** A holds unique key K, then leave/Return/Temporary Absence/HP_ZERO/confirmed death/Waiting/ordinary Revive. At actual ENTERED variant exits without continuation; variant atomically materializes same-key new life; variant enters different-key route. Unbound unique body has pending own replacement before terminal exit.
+**Expected Resolution:** all pre-entry transitions retain same claim, B remains blocked. Actual entry absent atomic same-key continuation releases old K (default exit included); B can later acquire. Immediate same-key continuation retains/transfers without unclaimed interval/race; B never commits duplicate. No-True-Self pending recovery retains until actual terminal instance exit. Replayed/stale release cannot free replacement holder's claim.
+**Forbidden Outcomes:** death/Waiting/Revive/Field leave releases; same-key atomic continuation exposes free key; any unbound corpse releases before its admitted lifecycle reaches terminal; old-holder redelivery releases new holder.
+**Layers Under Test:** ENT-021/REC/lifecycle/Identity constraints, reservation/transaction/save.
+
+## N-023 — Unique Forms, Random Materialization and Deck-only No-reroll
+
+**ID:** `N-023`
+**Status:** `MUST_PASS / MUST_REJECT missing random policy`
+**Fixture/input:** two FORMs share canonical unique identity; random materializer has explicit filter/no-reroll failure policy (Pygmalion control); separate explicitly authored reroll policy. Selected candidate becomes illegal before final protected commit.
+**Expected Resolution:** FORMs do not bypass key ownership; known duplicates filtered under generator policy, final duplicate cannot commit. Pygmalion local failure/no-reroll remains; another generator's explicit policy remains its own. Deck blocked card never rerolls. Missing random failure profile stays REQUIRED_EXPLICIT, no global fallback.
+**Forbidden Outcomes:** eachFORM new unique key; legal duplicate transiently committed; no-reroll Deck silently applied to all lotteries; rewriting Character presentation-selection policy.
+**Layers Under Test:** ENT-021/022, definition/identity/pool/reservation/RNG, existing canon profiles.
+
+## N-024 — Divinity External Owner, Categories and Equal-AXIOM Conflict
+
+**ID:** `N-024`
+**Status:** `MUST_PASS`
+**Fixture/input:** explicit DIVINE_NATURE bearer. Enemy NORMAL Debuff, ally NORMAL Buff, external PHAP_TAC Mark, external QUY_TAC Buff/Debuff/Mark, self-owned NORMAL Buff/Debuff/Mark. External AXIOM State has actual independent Character owner with resolved AUT inputs (winning/losing/exact-tie controls). Attribution/visual caster differs from semantic State owner.
+**Expected Resolution:** external<=Rule State categories reject, irrespective alliance/sign; rejected instance never applies. Self-owned low-tier is not rejected by Divinity alone (ordinary legality still tested). AXIOM incoming invokes AUT exact-clause conflict and may win/lose/NO_OVERRIDE under current law, not auto-reject. Semantic owner determines external after valid identity/provider projection. Unrelated Damage in same package stays independently valid.
+**Forbidden Outcomes:** ally exemption; harmful-only gate; Damage Attribution used as owner; self low-tier denied; whole package canceled; trait automatically wins equalAXIOM.
+**Layers Under Test:** STA-010/011/AUT, typed State admission/provider/provenance.
+
+## N-025 — Divinity Non-State Negative Space and Plain Prime
+
+**ID:** `N-025`
+**Status:** `MUST_PASS`
+**Fixture/input:** Divinity bearer receives otherwise legal Damage/Heal/Shield/Resource/MaxHP mutation/Cost/Position Mutation, History observation, Reincarnation bookkeeping, Unique validation and Heavenly strike. Plain Prime definition has no explicit trait. Separate kit-authored non-State protection clause control, including Ký's explicit Overheal-to-Shield restriction.
+**Expected Resolution:** Divinity alone rejects none of these categories; ordinary separate rules govern. Thunder applies. Plain Prime gains no Divinity. Explicit extra kit clause can govern only its own category/scope under its Authority law, does not widen DIVINE_NATURE globally or promote other Ability tiers. No new trait Functional Tags or World registration.
+**Forbidden Outcomes:** generic all-beneficial/harmful/neutral Effect immunity; global Shield/Heal deny; every Prime auto trait; removal of explicit separate Character clause by taxonomy migration.
+**Layers Under Test:** STA-011/AUT-005, existing Effect/State Admission, migration boundaries.
+
+## N-026 — River Cannot Rewind World Records, Lineage, Claims or Resources
+
+**ID:** `N-026`
+**Status:** `MUST_PASS / MUST_REJECT forbidden write`
+**Fixture/input:** River imported alongside two ALWAYS_RESIDENT laws. Allied snapshot recorded AE/Rage/world observations before current paid Ultimate; current AE/Rage differ both high/low directions. True Self waiting or already entered, Heavenly count3/baseline B, acquired Unique claim; history Deck/HP/stat snapshot predates them. Relevant restored stat crosses3.5B at History commit.
+**Expected Resolution:** existing M-200–M-203 guarantees exact current AE/every Actor Rage/RNG/ledger progress/new-life identity/direct Cost Bar and receipt-only50% refund. Waiting same-life branch remains HIS eligible, entered old-life local fail; no Luân Hồi rewind. Historical observation does not mutate Heavenly baseline/count, sealed lineage or Unique claim; history Return does not release claim. Current Unique constraint rejects any illegal duplicate historical presence branch; a separate actual no-True-Self terminal-exit control releases under ENT-021 lifetime, not snapshot copy. Restore assignment emits no ordinary Damage/Heal. Its subsequent stable stat checkpoint can create a separate real Heavenly strike#4 with retained baseline/count and untouched Shield, then ordinary lifecycle; no rewind/injected Character Action. Both always laws coexist with conditional River without ownership duplication.
+**Forbidden Outcomes:** historical counter reinstatement/reset; old-life identity/AE/Rage refunds/clamps; world-ledger/claim writes hidden in “all counters”; Damage trigger from historical HP assignment; River always resident or Reincarnation inheritance importing it.
+**Layers Under Test:** HIS/INS-003/REC/ENT-021, exclusion write sets/System stores/transactions and cross-foundation regression.
+
+## N-027 — Resident World Laws Without Invented Real-time Cadence
+
+**ID:** `N-027`
+**Status:** `MUST_PASS / MUST_REJECT missing adapter / FUTURE_MODE_PROBE periodic cadence`
+**Fixture/input:** real Exploration Combat Instance no SSI/Natural model; shared eligible materialization/stat/MaxRage/True-Self commits. Request turn-based periodic Heavenly cadence or unsupported lifecycle scheduling without adapter. Arena with explicit Natural model vs no such model.
+**Expected Resolution:** Luân Hồi/Thiên Lôi remain resident; shared finite materialization/mutation/bound-True-Self/cohort bookkeeping stays meaningful under actual profiles. Unsupported periodic cadence/scheduling is REQUIRED_EXPLICIT MODE ADAPTER, no seconds/attack cycle/polling and no disabled Axiom. An Arena with actual compatible Natural abstraction can bind the declared Main-style cadence; otherwise explicit adapter required. Missing adapter does not block Main cases or copy resource tables/kit.
+**Forbidden Outcomes:** resurrect “No Luân Hồi in Exploration”; real-time waiting clock invented; featureflag false disables mandatory world law; same Natural duration silently seconds; new Mode-specific Reincarnation subsystem.
+**Layers Under Test:** H.5/INS-003, Mode validation/Simulation Adapter, J-002/META-005 regression.
+
+---
+
 # 19. ARCHITECTURE META-TESTS
 
 ---
@@ -5281,12 +5448,9 @@ Tests marked `PROBE_UNRESOLVED` pass only if:
 
 **Status:** `MUST_PASS`
 
-Turn-based stress tests must not force:
-- SSI;
-- Luân Hồi;
-into Exploration profile.
+Turn-based stress tests must not force SSI, Natural periodic cadence, turn durations or class-resource tables into Exploration. Real Combat Instances keep Luân Hồi/Thiên Lôi ALWAYS_RESIDENT and River conditional import; residency is not a copied scheduler. Missing lifecycle/cadence adapters stay REQUIRED_EXPLICIT, never invented seconds or disabled world law.
 
-Exploration gaps do not invalidate the turn-based architecture.
+Exploration gaps do not invalidate the turn-based foundation.
 
 ---
 
@@ -5346,6 +5510,8 @@ When executable Kernel tests exist, at minimum create Golden Traces for:
 49. `M-073` malformed/unsupported opt-in profiles reject before affected mutation, preserving default owners/profiles.
 
 ---
+
+Foundation golden traces additionally require N-010–N-027: System registration/import checkpoint; baseline/subject/profile refs; complete violation causes/strike ordinal/amount/Shield policy and terminal identity; True-Self binding/death/candidate/entry lineage; claim acquire/retain/transfer/release by actual request order; exact State owner/category/tier/AUT admission. Pin designer-confirmed Natural-start read before expiry; History assignment and subsequent World Damage must have distinct causes/transactions.
 
 # 21. GOLDEN TRACE SHAPE
 
@@ -5497,6 +5663,17 @@ Future automated test harness should generate many states and assert:
 - legacy `QUEUE_UNTIL_ACTION_COMPLETE` is never silently aliased to `AFTER_DIRECT_EFFECTS_COMPLETE`
 
 ---
+
+## World / Trait foundation
+
+- Explicit World residency never inferred from Rank; Traits never register World systems.
+- Heavenly subject baseline/count immutable across True-Self lives; one committed strike per qualifying subject/checkpoint with complete causes and stable ordinal.
+- First3 Shield absorption increments count;4+Shield ledger untouched; ordinary mitigation/modification/redirect cannot alter fixed20% request.
+- No bound True Self never Waiting; lineage basis independent of River and excludes transient default contributions.
+- Unique claim lifetime is identity/lifecycle owned, not current presence; blocked Deck keeps card/slot/no reroll; authoritative request order selects first successful claimant.
+- Divinity only external BUFF/DEBUFF/MARK<=Rule; self-owned ordinary rules and equal-AXIOM AUT remain; Prime does not infer trait.
+- River write sets preserve exact AE/Rage/RNG/ledger/World/claim records; observation never grants restore permission.
+- Non-Natural Mode cadence is explicit, not wall-clock conversion or residency toggle.
 
 # 23. FUZZING TARGETS
 
@@ -5769,12 +5946,12 @@ Current suite defines:
 - 14 anti-scripting/validation tests;
 - 7 unresolved Contract probes;
 - 207 character-derived integration tests;
-- 9 cross-system torture tests;
+- 27 foundation/cross-system torture tests;
 - 5 meta-tests.
 
 Total named test cases:
 
-338 tests / probes / meta-tests (333 A–N cases plus 5 META cases)
+356 tests / probes / meta-tests (351 A–N cases plus 5 META cases)
 
 The count is not a design target.
 

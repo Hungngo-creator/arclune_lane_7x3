@@ -1,6 +1,6 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-10-10-G.25
+**Version:** 2026-10-10-G.26
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
@@ -52,9 +52,11 @@
 
 **Revision G.25:** extends existing HistoryState/Snapshot/Transaction/Deck Result/Action owners for conditional provider import, immutable baseline/profile capture, bounded excluded-resource Side restore, occupancy reconciliation, deployment payment receipts and finite seeded Forced Basics. AE/Rage/ledger/RNG remain exact current values; no second History subsystem or Character runtime.
 
+**Revision G.26:** existing CombatInstanceState/System/Stat/Snapshot/Damage/Resource/Lifecycle/Reincarnation/Admission/Materialization/Transaction owners execute explicit World residency, finite Heavenly records/strikes, lineage basis and identity Trait policies. No Character manager, new subsystem, callback bus or global priority; G.25 River semantics remain.
+
 # 0. EXECUTIVE ARCHITECTURE
 
-Arclune Kernel is the authoritative deterministic runtime that executes normalized Character data.
+Arclune Kernel is the authoritative deterministic runtime that executes normalized Character data and shared typed System profiles. World law definitions bind through the Combat Instance registry independently of Character Ability IR.
 
 Canonical pipeline:
 
@@ -205,7 +207,10 @@ Examples:
 - Presentation Definition reference;
 - Story Definition;
 - Contract profile;
-- Mode Profile.
+- Mode Profile;
+- typed World-Axiom residency/observation definition;
+- Axiomatic Trait admission/materialization policy;
+- authoritative Stat metadata/profile.
 
 Runtime entities reference definitions by stable ID.
 
@@ -257,6 +262,8 @@ validationHash
 None of these plans creates a new Primitive by itself.
 
 E.22 adds only bounded fields to existing plans: State/target-plan hitProbabilityModifier; effectModifierPlan's explicit all-Damage receive phase; Scheduler/State removal-input binding; field-State grant membership and finite Effect-package definition/selection refs. Missing finite pool content is non-executable CONTENT_TBD rather than an invented no-op plan. Reject outdated compatibility/validation hashes for opted-in data; current E.22/F.24/G.23 is required. Existing unprofiled IR remains unchanged.
+
+G.26 also consumes E.25 System/trait plans: typed family/residency/dependency, exact static Stat/provider/baseline/subject and checkpoint/cause/counter/Damage refs, lineage death/candidate/entry basis, identity Unique key/claim transition, and State category/semantic-owner/tier/AUT scope. World definitions bind in Combat Instance initialization, not ordinary Character triggerGraph. Require fresh normalized System/Mode compatibility/hash; missing active stat or future System-adjudication inputs reject the affected content. Do not rewrite PR #48 River plan operands.
 
 Kernel may reject IR if:
 - version mismatch;
@@ -3740,6 +3747,12 @@ check target eligibility
 
 ---
 
+DIVINE_NATURE AXIOMATIC_TRAIT contributes only STA-011's typed BUFF/DEBUFF/MARK admission rule, with AXIOM clause Authority and explicit semantic-owner-vs-recipient-self projection. Resolve actual State owner (ally/enemy irrelevant); reject external NORMAL/PHAP_TAC/QUY_TAC before instance commit. Self-owned low-tier passes ordinary rules. External AXIOM State enters existing Authority Resolver on the exact conflict; no unconditional trait reject.
+
+Prime alone registers nothing. Definition/identity acquisition retains explicit trait scopes and cannot promote Ability Authority. No DivineNatureSkillManager or universal all-Effect gate: Heal/Shield/Damage/Resource/MaxHP/Cost/Position/History/Reincarnation/Uniqueness do not match this trait. Separate explicit kit protection clauses keep their own admission scope; Heavenly's world request is unaffected by Divinity.
+
+---
+
 # 64A. SCOPED EFFECT ADMISSION GATEWAY
 
 Kernel provides a generic scoped Effect Admission boundary for non-State Effects whose target currently owns a matching admission/protection rule.
@@ -4342,11 +4355,25 @@ Base write and coherent final contribution/progress view require all-entry eligi
 
 Persist current base/revision, originating operation/transaction terminal key, threshold checkpoint and complete transition results alongside existing ledger/replay data. Separate committed reductions read the last committed base, and duplicate/resumed Effects reuse their outcome without subtracting again. Transaction abort exposes no partial base/eligibility decision. Cached views are versioned reads; no independent threshold store or polling/leave listener releases stale Revive work.
 
+## 88A. Bound True-Self eligibility and lineage record
+
+Read authoritative valid True-Self binding at DEATH_CONFIRMED, not roster origin. No bound True Self means no waiting/lineage candidate/cohort membership; do not synthesize a soul or send an empty corpse to Reincarnation. Borrowed body holding a True Self routes that exact soul; body whose binding was removed before death does not. Body-only lifecycle may have its own explicit recovery/terminal policy, separate from World waiting.
+
+Existing ReincarnationState/identity/death ledger retains PREVIOUS_LIFE_INHERITANCE_BASIS beside the exact death/waiting record: trueSelfId, lifeSerial, deathRecordRef, immutable typed stat/contribution basis/provenance, CANDIDATE/SEALED/RETIRED terminal state. Snapshot Runtime/P-002 captures the bounded basis, not P-120 River history. Stat store/contribution ledger supplies intrinsic/static Rank-Multiplied values and profile-qualified inheritable battle-persistent growth; filter transient Buff/Debuff/temporary State/Field contributions before flattening. No copied CurrentHP/resources/Shield/State objects/CD/temp form. Explicit finite kit exceptions use their own profile. No double Rank scaling.
+
+Death commit/world bookkeeping joins candidate registration with the exact waiting record and protected binding/death/stat views. Preserve necessary death-checkpoint basis before cleanup; publication order cannot change it. Ordinary Revive before entry joins waiting closure and candidate retirement; failed Revive retires neither. New death with unchanged ordinary lifeSerial still owns a new death record/candidate. Actual ENTERED_REINCARNATION joins old-life Revive ineligibility and sealing/promotion of that exact candidate, then existing route work reads it only when its statPolicy opts in. Inactive/retired candidate cannot be promoted by historical state restore or another entry.
+
+No eligible route after existing complete-entry settlement results in terminal True-Self Combat Instance exit, with no random Character/new-life spawn. Preserve route Rank-first/Authority/host/pool/reservation/failure policies, current battle base/contributions, Death Cohort counts and mandatory-before-ordinary-Reactions ordering. Pending authored route/container obligations follow their explicit law; mere World residency creates none.
+
+Pygmalion host/creator basis and Kenoma host-only binding remain current-profile reads, not previous-life inheritance. Luân Hồi Chi Chủ's stat-fraction route can use default lineage basis when its finite stat profile resolves. Ký Ức's special ordinary-Revive snapshot remains explicit and independent. River absence never prevents lineage capture; River observation/restore never owns or rewinds this ledger. Save/replay retains immutable candidate/profile/death/entry and terminal identities in existing ledger, no SoulManager2 or ReincarnationRuntime2.
+
+---
+
 # 89. QUALIFYING LUÂN HỒI DEATH
 
 Default qualifying:
 - Chân Ngã-bearing Character;
-- relevant NPC/real life entity as defined by mode/system.
+- relevant NPC/real life entity as defined by mode/system **only when valid True Self is actually bound at death**. No-bound eligibility is never an implicit mode exception.
 
 Default excluded:
 - any explicitly empty body without bound Chân Ngã, including collection Characters;
@@ -4777,7 +4804,7 @@ load/freeze SnapshotRef + typed scope/profile
 → expose HISTORY_RESTORE evidence
 ```
 
-Preserve current Side AE and Rage of **every** Actor/provider, including dead/waiting same-life owners and caster after Ultimate Cost. Do not load snapshot values as resource proposals, calculate their deltas, reset/fill on Field entry, or allow restored Max/cap/contribution changes to clamp them. Incompatible derived writes fail validation before commit; restore has no AE/Rage mutation operand. Bar is excluded from copy, with only explicit receipt-backed refund addition permitted. RNG cursor and World Reincarnation ledger/progress/True-Self/new-life identities remain current. No resource or lifecycle init routine is called by historical presence reconstruction.
+Preserve current Side AE and Rage of **every** Actor/provider, including dead/waiting same-life owners and caster after Ultimate Cost. Do not load snapshot values as resource proposals, calculate their deltas, reset/fill on Field entry, or allow restored Max/cap/contribution changes to clamp them. Incompatible derived writes fail validation before commit; restore has no AE/Rage mutation operand. Bar is excluded from copy, with only explicit receipt-backed refund addition permitted. RNG cursor and World Reincarnation ledger/progress/True-Self/new-life identities remain current. INS-003 Heavenly baseline/count, Reincarnation lineage and ENT-021 Unique claims remain protected System/identity records, not allied Character counters; no historical claim/baseline/counter value is copied or reset. Validate current Unique constraints on presence branches; ENT-021 still governs any actual no-True-Self terminal instance exit. No resource or lifecycle init routine is called by historical presence reconstruction.
 
 Same-life waiting restoration checks the current world ledger under the protected view before building a branch. Restore active battle state/waiting eligibility coherently without copying ledger counters, deleting death history or creating a new life. Entered-Reincarnation old life is terminally ineligible; skip its branch, preserve new-life occupant/identity and continue others. Never invoke ordinary Revive or ON_REVIVE. Historical State/contribution reconstruction rebuilds admitted allied indexes once, not final stats plus duplicated modifiers; retain source/provenance and exclude out-of-scope enemy attachments/writes.
 
@@ -5258,7 +5285,7 @@ Turn-based instance owns:
 
 Current direction:
 - no SSI;
-- no Luân Hồi;
+- Luân Hồi/Thiên Lôi ALWAYS_RESIDENT in real Combat Instances; River CONDITIONAL_IMPORT;
 - simplified Ability profile;
 - movement speed;
 - attack speed;
@@ -5266,7 +5293,7 @@ Current direction:
 - Rage;
 - AE generation.
 
-Do not implement by forcing continuous time into SSI.
+Do not implement by forcing continuous time into SSI. Shared World materialization/mutation/death checkpoints remain meaningful; unsupported lifecycle scheduling and Heavenly periodic cadence require explicit Mode adapters, never invented seconds or World disablement.
 
 ---
 
@@ -5424,30 +5451,67 @@ DEATH_CONFIRMED
 
 ---
 
-# 146. WORLD AXIOM IS NOT ORDINARY LISTENER
+# 146. WORLD AXIOM OWNERSHIP AND FINITE OBSERVATION
 
-Do not implement World Axiom Luân Hồi as a low-priority Character Trigger that can accidentally lose queue priority.
+Existing Combat Instance Manager/CombatInstanceState holds the System definition registry/bindings, consumed by Contract Resolver and existing domain owners. Register WORLD_AXIOM_REINCARNATION and HEAVENLY_THUNDER_IMPARTIALITY ALWAYS_RESIDENT before gameplay in every real instance. Resolve RIVER_OF_LIGHT_AND_SHADOW as CONDITIONAL_IMPORT through the existing dependency/import path, never default-register it because other World laws are resident. Missing future residency rejects normalization/setup. World binding has no Character owner and no Trait attachment; DIVINE_NATURE/UNIQUENESS remain identity metadata consumed by Admission/Materialization, not System registrations. Rank/Prime supplies neither access nor trait nor Ability Authority.
 
-It is a privileged lifecycle observer.
+A World law runs finite mandatory checkpoints under INS-003. It is not an ordinary low-priority Character Trigger or arbitrary Axiom callback bus. Existing scheduler/lifecycle/stat/resource/materialization writers publish exact committed checkpoint refs to the bounded System plan; Transaction Manager closes required world work before dependent continuation. Do not poll frames or scan Character names/prose. Ordinary unrelated Reaction priorities remain unchanged.
+
+## 146.1 Heavenly subject record in existing System state
+
+CombatInstanceState owns the profile-scoped subject record; Snapshot/Stat/Identity stores supply immutable basis/providers. Logical payload:
+
+```text
+CombatInstance + System profile + (bound trueSelfId else actor/life key)
+baselineRef + static stat/profile/provenance
+heavenlyStrikeCount
+last coherent violation view/revision
+checkpoint/observation/strike terminal identities
+active authoritative subject/provider binding
+```
+
+These are bounded records in existing stores, not HeavenlyThunderCharacterManager/new queue/Character State. Project shared parts to authoritative lifecycle/stat/HP owner; period comes from one actual delegated owner opportunity. Preserve body/part contacts as evidence without duplicating the subject/strike.
+
+Capture HEAVENLY_STAT_BASELINE at first eligible static initialization after Rank/Star/progression and before transient modifiers. Existing stat initialization/Snapshot binding must expose that typed static view, not effective Buff-inflated values. Read tracked Stat Definition/profile rankMultiplierScaled metadata. Missing/non-positive baseline denominator or ambiguous provider requires an explicit supported profile before execution. Do not patch guessed values or hardcode a Character list.
+
+Bound trueSelfId looks up the same record across death/waiting/Revive/Deck/redeploy/Reincarnation/new body in this instance. Never reinitialize baseline/count on lifeSerial change. A body receiving a True Self switches to that subject's existing record at the successful binding checkpoint; no merge/reset from body-only state. If absent, first True-Self record gets the same resolved static initialization basis, not current transient stats. Body-only records remain actor/life scoped. Leaving/temporarily legal status preserves all retained values; no active Field subject means no strike. Terminal cleanup can release payloads after obligations while retaining dedup evidence under replay horizon.
+
+## 146.2 Stable violation observation and strike execution
+
+Existing Materialization/Field Presence writer supplies entry/reentry checkpoint; Stat/Resource/Identity writers supply relevant committed mutation checkpoint only for tracked Effective Stat, CurrentMaxRage or subject/baseline binding. After the whole owning atomic commit, evaluate one coherent view. Snapshot full typed cause set: any tracked effective>=3.5baseline or actual enabled Rage Max<=50; absent Rage is no cause. Store terminal observation under exact System/instance/subject/checkpoint identity.
+
+Entry/reentry violating or non-violating→violating mutation requests one strike; Main each owner Natural opportunity start reads before State expiry/start settlements under the latest designer lock and requests one if still violating; relevant mutation after that work has its separate committed checkpoint. Overlapping cause/checkpoint reasons merge before requesting, not multiple Damage packets. Non-Natural/CC status does not create/suppress periodic work; CC-lost Natural still runs the start checkpoint. POSTMORTEM_WAIT/pass contacts do not become owner opportunities. Revalidate present/eligible provider before request. No fabricated eventSeq/list ordering creates a later checkpoint.
+
+For admitted strike, use the protected subject/count revision, ordinal=count+1 and target CurrentMaxHP snapshot. Build ordinary TRUE Damage packet with System source/AXIOM clause and the fixed20% amount profile. Existing Damage Resolver skips ordinary mitigation/modification/caps/miss/target/Damage redirect/lower-tier denial under INS-003, allowing only explicit AXIOM conflict and declared Shield absorption exception. Do not route via ordinary Character Target Selection/Taunt or multiply with ALL_DAMAGE take-less. This is finite data in the existing Damage/authority plan, not a fourth component pipeline, scripted strike or new Primitive.
+
+Ordinal1–3 resolves ordinary Shield ledger; ordinal4+ projects no Shield writes at all. Join Damage/HP/receipt and counter increment under Transaction Manager; full absorption still increments. Protect/persist ordinal, cause/amount snapshot, Shield mode and exact Damage/counter terminal outcome. Duplicate checkpoint/delivery/save-resume reuses this outcome, never adds another strike or increments into a different Shield mode. Abort/stale protected input exposes no partial HP/Shield/counter commit; revalidate the same operation under existing transaction law.
+
+After Damage commit, Lifecycle Runtime handles ordinary HP_ZERO/prevention/death/World Reincarnation bookkeeping before dependent Action/SSI continuation. Prevention does not refund the strike count or repeat Damage. Only legal/alive subject continues the already granted Natural opportunity, then CC/form/admission uses ordinary rules; no extra opportunity or fabricated ACTION_GENERATED class-resource gain from the System strike. Separate real Damage observations and any valid DAMAGE_RECEIVED grants retain their existing cause/admission law and World source/cause; no fake caster/Action attribution. Real future AXIOM conflict uses existing Authority Resolver with supported actual System adjudication inputs; unavailable inputs are REQUIRED_EXPLICIT, not a new upper tier.
+
+Existing HistoryState's bounded restore write set excludes this System record, Reincarnation lineage and identity Unique claims. A relevant History stat reconciliation commits first, then feeds its stable world checkpoint; resulting Heavenly Damage is a separate System commit, not Heal/Damage emitted by the History assignment. Current AE/Rage at the History restore barrier remain exact under HIS. No rewind/re-registration/reset of provider records on historical entry.
 
 ---
 
 # 147. UNIQUENESS
 
-Materialization Validator checks Duy Nhất before commit.
+Existing Materialization Validator consumes UNIQUENESS AXIOMATIC_TRAIT and canonical uniquenessIdentity; CombatInstanceState/identity constraints own claims. This is not UniqueCharacterManager, a resident World-Axiom registration, Functional Tag or Character Trigger. FORM of one Character uses the same canonical key unless a genuinely distinct registered identity is explicit.
 
-Random candidate selection pipeline:
+Deck population never claims. Successful materialization/deployment atomically validates/reserves/acquires the key with identity/presence/payment under ENT-021. Use authoritative gameplay request/transaction sequence; do not let Entity/Slot/list/hash enumeration/Event publication choose a concurrent winner. Protect claim revision and holder generation; absent supported ordering rejects affected execution content instead of creating hidden priority.
+
+Retain claim through leave/Return/Temporary Absence/HP_ZERO/DEATH_CONFIRMED/Waiting/ordinary Revive. At actual ENTERED_REINCARNATION, retire old-life claim unless the same protected transaction supplies same-key new-life continuation. Transfer/retain atomically without publishing an unclaimed gap. No-True-Self holder releases only on terminal Combat Instance exit, not deadness with an admitted pending return. Existing lifecycle/reincarnation/identity transaction owns release/transfer; save/replay terminals prevent double acquire/release or stale release of a replacement holder.
+
+Blocked Deck card stays in its original slot/count, DEPLOY_FROM_DECK fails legality, no payment/presence/claim commit and no auto reroll/replace. After release a later request revalidates ordinary deployment conditions. Deck/Field history reconciliation cannot rewind/copy a claim or release it merely by Return/absence; HIS presence branches must validate current claim/identity constraints before commit. An actual no-True-Self terminal instance exit can release under ENT-021, as it does for other causes, without copying a snapshot claim. Do not suppress that real lifecycle law or allow a duplicate historical occupant to commit.
+
+Random materialization uses its existing policy:
 
 ```text
-build eligible definitions
-→ apply Uniqueness eligibility if known before draw
-→ random select
+build eligible canonical definitions
+→ apply actual Uniqueness eligibility where known
+→ freeze pool/seeded select
+→ revalidate/reserve key at protected commit
 ```
 
-If uniqueness conflict only becomes knowable at final materialization:
-- use explicit failure/reroll policy.
-
-No illegal materialization then rollback unless Contract specifically uses transactional retry.
+Invalid final candidate closes under the generator's explicit failure/reroll policy; no illegal duplicate may commit. Deck no-reroll is not imported into all random generators. Existing Pygmalion pool/no-reroll/host and other appearance policies stay intact.
 
 ---
 

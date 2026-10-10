@@ -21,7 +21,7 @@ Khi **một Chân Ngã của đồng minh hoặc kẻ thù thực sự tiến v�
 
 **Clock nở kén:** chờ **Natural Action tiếp theo của Luân Hồi Chi Chủ mà hắn thực thi thành công**. Một cơ hội bị CC làm mất lượt không làm nở kén; kén tiếp tục chờ tới một Natural Action thành công sau đó. Auto/Reaction/Counter/Follow-up và global Turn Boundary không thay cho Natural Action đó. Việc hoàn tất lượt thành công là điều kiện nở, không phải chỉ tới lượt, nhận quyền hành động hoặc bắt đầu một Action rồi bị hủy. Kén được tạo trong một Natural Action đang chạy chờ Natural Action tiếp theo, không dùng completion của chính lượt đang chạy để giả thành “lượt kế tiếp”. Quy định này thay thế thời hạn cũ một Turn Boundary và ví dụ “một turn sau tự nở”.
 
-Appearance selection: ngoại hình của đời mới là ngoại hình bất kỳ character có trong Collection nhưng **không được chọn ngoại hình của các character đang tham gia/tồn tại trong Deck của trận đấu đó**. Đời mới thuộc phe của Luân Hồi Chi Chủ bất kể Chân Ngã trước khi chết thuộc phe nào. Nếu definition có tag **Duy Nhất**, phải kiểm tra Duy Nhất trước khi materialize; không được để random appearance phá Axiom Duy Nhất.
+Appearance selection: ngoại hình của đời mới là ngoại hình bất kỳ character có trong Collection nhưng **không được chọn ngoại hình của các character đang tham gia/tồn tại trong Deck của trận đấu đó**. Đời mới thuộc phe của Luân Hồi Chi Chủ bất kể Chân Ngã trước khi chết thuộc phe nào. Nếu effective canonical identity có AXIOMATIC_TRAIT **UNIQUENESS**, kiểm tra typed uniqueness key/claim trước materialization; presentation FORM không tự tạo identity/claim mới. Không để random appearance commit illegal duplicate; exact appearance applicability/failure policy vẫn phải author rõ.
 
 **Second reincarnation lock:** mỗi Chân Ngã chỉ được nội tại này thao túng để đầu thai **một lần trong trận**. Đời nở từ kén lại chết và vào Luân Hồi lần thứ hai → không tạo kén mới, không bị nội tại này thao túng và **không đầu thai trở lại trận đấu nữa**. Trạng thái mô tả là `REINCARNATION_EXHAUSTED`, không cấp một route/host khác để lách giới hạn đó. Đây là giới hạn trong trận; không suy diễn thành Chân Ngã bị ERASED khỏi tồn tại trong lore. Lore có thể cho đầu thai vô hạn nhưng kit chiến đấu này không cho lặp vô hạn.
 
@@ -29,7 +29,7 @@ Appearance selection: ngoại hình của đời mới là ngoại hình bất k
 
 Đời mới có **bốn giai đoạn**, không phải ba. Raw dùng cả Natural Action của đời mới và Turn Boundary; không tự bỏ một clock hoặc rút mỗi giai đoạn còn một Natural Action như khuyến nghị cũ. `TURN_BOUNDARY` vẫn là boundary SSI toàn cục, không có một loại boundary riêng của đời mới.
 
-**Giai đoạn I — Ấu Niên:** kế thừa **30%** mọi chỉ số thuộc profile kế thừa đời trước; giữ **Rank, Class, Passive, Basic và Ultimate của Chân Ngã B**, không kế thừa chúng từ ngoại hình A. Không thể dùng Skill 1/2/3. **Giai đoạn II — Thành Niên:** kế thừa **50%** mọi chỉ số đời trước, mở Skill 1. **Giai đoạn III — Tráng Niên:** kế thừa **70%** mọi chỉ số đời trước, giữ Skill 1 và mở thêm Skill 2/3. Mỗi lần tăng là **20 điểm phần trăm của chỉ số đời trước**, không nhân 1,2 phần kế thừa hiện có.
+**Giai đoạn I — Ấu Niên:** kế thừa **30%** chỉ số thuộc typed previous-life profile; default basis là PREVIOUS_LIFE_INHERITANCE_BASIS của Luân Hồi (intrinsic/static Rank-Multiplied + explicitly inheritable battle-persistent growth, loại transient Buff/Debuff/temporary State/Field contributions), không River snapshot; giữ **Rank, Class, Passive, Basic và Ultimate của Chân Ngã B**, không kế thừa chúng từ ngoại hình A. Không thể dùng Skill 1/2/3. **Giai đoạn II — Thành Niên:** kế thừa **50%** mọi chỉ số đời trước, mở Skill 1. **Giai đoạn III — Tráng Niên:** kế thừa **70%** mọi chỉ số đời trước, giữ Skill 1 và mở thêm Skill 2/3. Mỗi lần tăng là **20 điểm phần trăm của chỉ số đời trước**, không nhân 1,2 phần kế thừa hiện có.
 
 **Giai đoạn IV — Lão Niên:** giữ kit đã mở ở giai đoạn III; mỗi lượt cá nhân giảm 20% phần chỉ số kế thừa từ đời trước cho tới khi chết. Tài liệu trước mô tả decay tuyến tính theo inherited baseline, không compound; raw mới không chỉ định công thức khác. Khi **Max HP thực tế về 0, lập tức DEATH_CONFIRMED**, rồi vào Luân Hồi lần thứ hai và áp dụng giới hạn không đầu thai lại. Không đợi một hit sát thương hoặc một Natural Action mới để xác nhận death. Phần chỉ số kế thừa giảm không mặc định xóa modifier độc lập khác; điều kiện kết thúc raw là Max HP thực tế bằng 0.
 
@@ -49,7 +49,7 @@ DEATH_CONFIRMED của đời tái sinh là death thật và được World Axiom
 
 ## VI. Axiom / Authority
 
-**Luân Hồi:** World Axiom. Luân Hồi Chi Chủ là character có quyền thao túng Chân Ngã/đời tái sinh theo cơ chế kit. **Thần Tính:** Axiom cá thể; không nhận mọi hiệu ứng/buff/debuff/mark có lợi, có hại hoặc trung tính từ nguồn ngoài bản thân, kể cả đồng minh. Thần Tính không phải authority mặc định của toàn bộ skill Luân Hồi Chi Chủ. **Quy Tắc:** Nội tại Luân Hồi và Skill 1/Skill 3 Mark dùng authority Quy Tắc theo mô tả tương ứng; authority tier phải được tách khỏi Axiom identity. Skill thường không tự động thành Axiom chỉ vì Luân Hồi Chi Chủ là Prime.
+**Luân Hồi:** World Axiom ALWAYS_RESIDENT, không Character owner; access/route được kit khai rõ, không suy từ Prime. **Thần Tính:** explicit AXIOMATIC_TRAIT DIVINE_NATURE; không nhận external BUFF/DEBUFF/MARK NORMAL/PHAP_TAC/QUY_TAC (semantic owner khác recipient self), kể cả ally/có lợi/hại/trung tính. Self-owned State vẫn theo ordinary legality; external AXIOM State dùng AUT conflict. Không mặc định block Damage/Heal/Shield/resources hoặc system bookkeeping. Thần Tính không phải authority mặc định của toàn bộ skill Luân Hồi Chi Chủ. **Quy Tắc:** Nội tại Luân Hồi và Skill 1/Skill 3 Mark dùng authority Quy Tắc theo mô tả tương ứng; authority tier phải được tách khỏi Axiom identity. Skill thường không tự động thành Axiom chỉ vì Luân Hồi Chi Chủ là Prime.
 
 ## VII. Skill 1 — Cưỡng Hành Luân Hồi
 
@@ -89,7 +89,7 @@ Chưởng một orb đỏ-đen đan xen lên một enemy target, gây **100% ATK
 
 ## XII. Duy Nhất + Luân Hồi Chi Chủ
 
-Duy Nhất là Axiom độc lập, đồng cấp với Luân Hồi. Khi đời mới chuẩn bị materialize, phải kiểm tra Effective Identity/definition có tag Duy Nhất hay không trước commit. Nếu Duy Nhất không cho phép bản thể mới xuất hiện vì một bản thể hợp lệ khác đang tồn tại, random appearance không được dùng để phá Axiom. Resolution cụ thể (reroll presentation/definition hoặc từ chối materialization) cần được chuẩn hóa sau.
+Duy Nhất là AXIOMATIC_TRAIT UNIQUENESS với AXIOM clause, không World subsystem như Luân Hồi. Khi đời mới chuẩn bị materialize, kiểm tra effective canonical identity/key và active claim trước commit; FORM/presentation không tự là unique identity khác. Claim acquisition/lifetime/atomic same-key continuation dùng ENT-021 hiện hành. Nếu Duy Nhất không cho phép bản thể mới xuất hiện vì current claim khác còn active (kể cả holder ở Deck/Waiting), random appearance không được dùng để phá Axiom. Resolution cụ thể (reroll presentation/definition hoặc từ chối materialization) cần được chuẩn hóa sau.
 
 ## XIII. Giác Đấu Trường + Luân Hồi Chi Chủ
 
@@ -117,7 +117,7 @@ Nếu Luân Hồi Chi Chủ xuất hiện trong Giác Đấu Trường, Arena v�
 Các boundary chưa đủ dữ liệu thực thi:
 
 1. Exact Leader checkpoint/CC-lost opportunity cho lần trở lại đầu và retry Skill 2; không có Actor-private Turn Boundary.
-2. Exact fields và source checkpoint của “mọi chỉ số” kế thừa; không tự copy Current HP/Rage/AE/cooldown/temporary State như object hoặc cho ngoại hình A cấp kit. Scope khóa Skill ở từng stage đối với auto/child cast của Passive/Ultimate đời trước phải được khai báo, không ngầm bỏ Ultimate hoặc tự mở đủ ba Skill ở Ấu Niên.
+2. Exact finite stat fields của inheritance profile vẫn cần resolve; source/contribution default nay khóa bởi PREVIOUS_LIFE_INHERITANCE_BASIS tại qualifying death, seal khi ENTERED (candidate retire nếu ordinary Revive trước entry). Không tự copy Current HP/Rage/AE/cooldown/temporary State hoặc cho ngoại hình A cấp kit; transient inheritance muốn khác default cần explicit exception. Scope khóa Skill ở từng stage đối với auto/child cast của Passive/Ultimate đời trước phải được khai báo, không ngầm bỏ Ultimate hoặc tự mở đủ ba Skill ở Ấu Niên.
 3. Profile Current HP khi giảm/trả/tăng Max HP; stacking Skill 1 và failure của child Skill 1; không tự Heal phần hoàn Max HP.
 4. Eligibility/placement khi sân đầy hoặc Collection không còn ngoại hình hợp lệ, kén bị phá, owner chết/rời sân, và route contention với các kit khác. Các route hiện hành chỉ xét claimant thực sự eligible/có legal host; presence riêng lẻ không đủ.
 5. Skill 3 duplicate/ít-target policy, Mark refresh và multiple-marked-death batch/reward ordering; đọc Mark trước cleanup death để không làm mất quyền reward đã đủ điều kiện.

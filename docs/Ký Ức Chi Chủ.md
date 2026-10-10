@@ -26,9 +26,9 @@ Lãng Quên bắt đầu sau **mỗi lần phục sinh** và tồn tại qua **1
 **Target Selection ≠ Area Resolution:** Lãng Quên loại hắn khỏi danh sách mục tiêu được chọn nhưng không xóa vị trí chiến đấu. AoE đã xác định vùng tác động vẫn có thể chạm hắn nếu hắn nằm trong vùng; sát thương và hiệu ứng sau đó còn phải qua các admission/miễn nhiễm riêng, bao gồm Thần Tính. Lãng Quên không tự cấp Damage Immunity.
 
 ## 4. Thần Tính — Axiom
-Thần Tính có **Authority Axiom**, chặn **mọi hiệu ứng ngoài thuộc scope của nó**: Buff, Debuff, Mark và hiệu ứng có lợi/hại/trung tính, **kể cả buff từ đồng minh**. Viên Chúc không vượt được miễn nhiễm này bằng hiệu ứng xấu thông thường; nhận định về bảo vệ này cũng áp dụng cho các Prime có Thần Tính. **Thần Tính không tự động ngăn direct Damage** và không nâng các Skill khác của hắn lên Axiom. Chỉ khi điều khoản hiệu ứng trực tiếp mâu thuẫn với miễn nhiễm mới phán định Authority theo cơ chế hiện hành.
+Thần Tính là explicit **AXIOMATIC_TRAIT DIVINE_NATURE**, admission clause **Authority AXIOM**, reject external **Buff/Debuff/Mark NORMAL/PHAP_TAC/QUY_TAC**, có lợi/hại/trung tính và ally đều thuộc scope. External dùng semantic Effect/State owner != recipient self; self-owned State không bị trait block chỉ vì low tier, external AXIOM State dùng AUT conflict. Viên Chúc không vượt được miễn nhiễm này bằng hiệu ứng xấu thông thường; nhận định về bảo vệ này cũng áp dụng cho các Prime có Thần Tính. **Thần Tính không tự động ngăn direct Damage** và không nâng các Skill khác của hắn lên Axiom. Chỉ khi điều khoản hiệu ứng trực tiếp mâu thuẫn với miễn nhiễm mới phán định Authority theo cơ chế hiện hành.
 
-Thần Tính không xóa stat history đã snapshot. Chỉ modifier đã thực sự được áp dụng trước death mới có hậu quả được ghi thành nền đời sau; một modifier bị chặn không đóng góp vào snapshot. Ràng buộc Thần Tính Axiom đối với chuyển overheal thành Shield được ghi tại Ultimate.
+Thần Tính không xóa stat history đã snapshot. Chỉ modifier đã thực sự được áp dụng trước death mới có hậu quả được ghi thành nền đời sau; một modifier bị chặn không đóng góp vào snapshot. Separate explicit kit clause về chuyển overheal thành Shield được ghi tại Ultimate; nó không mở rộng default DIVINE_NATURE.
 
 Support vẫn có thể “viết lại ký ức về bản thể” **nếu điều khoản buff thắng được Thần Tính Axiom và thực sự áp dụng trước death**; enemy muốn ghi lại nền yếu hơn cũng phải vượt admission/miễn nhiễm tương ứng. Đây không phải ngoại lệ cho mọi buff có lợi. Scope này phù hợp STA-011 hiện hành, không yêu cầu thay đổi Contract chung.
 
@@ -56,7 +56,7 @@ AoE cố định **toàn sân = 200% ATK + 200% WIL của bản thân**. Dấu �
 
 Hoàn tất Damage Action rồi tự hồi HP bằng **20% tổng Actual HP Damage do chính Ultimate gây lên các mục tiêu hợp lệ**. Không tính Shield absorption, overkill, damage lên vật thể không hợp lệ, Reflect hoặc damage phụ từ nguồn khác. Ví dụ Ultimate gây tổng Actual HP Damage 1.000 → lượng hồi tính từ damage là 200 HP, rồi áp dụng giới hạn/điều khoản hồi phục tương ứng. Không tính echo Skill 2 hay damage đồng minh vào tổng này.
 
-HP vượt Max HP trở thành overheal và mặc định bị bỏ qua, không tự tạo Shield. Ngoại lệ đã chốt: kit của **nhân vật khác** có hiệu ứng chuyển overheal đồng minh sang Shield chỉ làm được nếu điều khoản tương ứng **thắng Thần Tính cấp Axiom của hắn**. Raw kit yêu cầu một Prime khác có lực chiến cao hơn để khả thi; lực chiến cao hơn riêng lẻ không thay thế kết quả phán định Authority hiện hành. Scope ngoại lệ này không cấp quyền tự động cho các buff đồng minh khác ở §4.
+HP vượt Max HP trở thành overheal và mặc định bị bỏ qua, không tự tạo Shield. Ngoại lệ đã chốt: kit của **nhân vật khác** có hiệu ứng chuyển overheal đồng minh sang Shield chỉ làm được nếu điều khoản tương ứng **thắng Thần Tính cấp Axiom của hắn**. Raw kit yêu cầu một Prime khác có lực chiến cao hơn để khả thi; lực chiến cao hơn riêng lẻ không thay thế kết quả phán định Authority hiện hành. Đây là **separate explicit kit-authored Overheal-to-Shield admission clause**, không default của DIVINE_NATURE foundation; giữ scope/AUT riêng, không lan thành Shield immunity cho mọi bearer hoặc quyền tự động cho ally Buff ở §4.
 
 Ý niệm Ultimate: “Ta không hồi phục; đau đớn khiến chúng nghĩ về ta, ký ức về ta càng thêm sâu đậm, càng nghĩ thì càng ám ảnh.”
 
@@ -64,7 +64,7 @@ HP vượt Max HP trở thành overheal và mặc định bị bỏ qua, không 
 Trong Forgotten, actor bị filter khỏi Target Selection nhưng không bị xóa khỏi battlefield geometry. Random AoE chọn ba enemy khác nhau không thể chọn hắn. AoE cố định toàn sân vẫn bao gồm hắn; AoE hàng/cột chỉ bao gồm hắn nếu đứng đúng vùng. AoE lấy unit làm tâm không thể chọn hắn làm tâm, nhưng vùng tạo từ một unit khác vẫn có thể bao gồm hắn. Ví dụ Skill 3/Ultimate của Đạo Mộng Dao dùng vùng cố định: nếu vùng Skill 3 không bao phủ hàng hắn đứng thì hắn không trúng. Việc không target được không tự chặn Damage hoặc bỏ qua Thần Tính khi Effect thật sự resolve vào vùng.
 
 ## 10. Duy Nhất
-**Không có Axiom Duy Nhất.** Độ phức tạp của kit không phải lý do để cấp Duy Nhất. Duy Nhất chỉ nên xuất hiện nếu lore xác nhận chỉ một bản thể Ký Ức Chi Chủ có thể tồn tại tại một thời điểm. Thần Tính + Quy Tắc Lãng Quên đã đủ tạo identity. Nếu một presentation/combat definition mà nhân vật tạm thời mang có tag Duy Nhất riêng thì Duy Nhất của definition đó vẫn được phán định theo Axiom; điều đó không biến cả character thành Duy Nhất.
+**Không có Axiom Duy Nhất.** Độ phức tạp của kit không phải lý do để cấp Duy Nhất. Duy Nhất chỉ nên xuất hiện nếu lore xác nhận chỉ một bản thể Ký Ức Chi Chủ có thể tồn tại tại một thời điểm. Thần Tính + Quy Tắc Lãng Quên đã đủ tạo identity. Nếu effective canonical identity/policy thực sự mang UNIQUENESS trait/key thì claim được validate theo ENT-021; mere presentation/FORM không tự thêm trait/key hoặc biến cả character thành Duy Nhất.
 
 ## 11. Rank/Class
 **Prime / Mage** là phù hợp. Prime vì có Thần Tính, Quy Tắc về Quên Lãng, memory snapshot xuyên death, nhiều revive và interaction sâu với death/identity. Mage vì core fantasy là thao túng ký ức/nhận thức bằng rule-level effects chứ không phải physical combat, ranged weapon, summon hay support healing thuần.
@@ -80,13 +80,13 @@ Trong Forgotten, actor bị filter khỏi Target Selection nhưng không bị x�
 8. Skill 3 đòi ba Basic Natural Actions chính liên tiếp của ba enemy khác nhau; khóa riêng từng target và vào CD caster ngay khi kích hoạt. Thiếu AE ở đòn thứ ba thì reset chuỗi.
 9. Auto Skill 2/3 không tạo/tốn Natural Action, AE gain hoặc Rage, không giảm CD Skill 1 và không phát sinh action/skill-use trigger ngoài ngoại lệ tường minh.
 10. Ultimate heal chỉ dùng own Actual HP Damage, không tính Shield absorption/overkill/damage khác; chuyển overheal thành Shield phải thắng scope Axiom tương ứng.
-11. Thần Tính chặn mọi hiệu ứng ngoài có lợi/hại/trung tính trong scope, kể cả buff đồng minh; không tự chặn direct Damage hoặc xóa stat history. Chỉ modifier đã thực sự áp dụng mới được snapshot.
+11. Thần Tính chỉ mặc định chặn external BUFF/DEBUFF/MARK<=QUY_TAC, kể cả ally; self-owned và equal-AXIOM dùng ordinary legality/AUT, không default block Damage/Heal/Shield/resources hoặc xóa stat history. Chỉ modifier đã thực sự áp dụng mới được snapshot.
 12. Không có Axiom Duy Nhất cho toàn nhân vật. Lục Cực Đồ và Engine Risk là hai hệ đánh giá riêng.
 
 ## 13. Các điểm chưa chốt và boundary normalization
 Các điểm đã chốt không còn là câu hỏi: chờ revive theo ô chết và không phụ thuộc occupancy; Lãng Quên sau cả ba revive/lần thứ ba mới ẩn nhân vật; duration cá nhân theo CLK-003; Skill 3 CD bắt đầu ngay và độc lập với khóa; target đã DEATH_CONFIRMED trước echo không nhận echo; heal Ultimate dùng own Actual HP Damage và loại overkill.
 
-Các diễn giải đã được designer chốt: hiệu ứng trong Lãng Quên chỉ ẩn khỏi đối thủ, vẫn có tác dụng; Thần Tính chặn cả buff đồng minh và hiệu ứng ngoài có lợi/hại/trung tính; Ultimate cộng 200% ATK + 200% WIL. Không còn câu hỏi trên ba điểm này.
+Các diễn giải đã chốt: hiệu ứng trong Lãng Quên chỉ ẩn khỏi đối thủ, vẫn tác động; newest foundation giới hạn DIVINE_NATURE ở external BUFF/DEBUFF/MARK<=QUY_TAC gồm ally/có lợi/hại/trung tính; Ultimate cộng 200% ATK + 200% WIL. Không còn câu hỏi trên ba điểm này.
 
 Các boundary chưa cung cấp dữ liệu thực thi: checkpoint Slot Clock tương ứng trong từng Mode, cách trình bày bản thể còn nhìn thấy nhưng ẩn thông tin vị trí ở revive 1/2 (§3), trình bày UI cho phe đồng minh, cấp Authority riêng của Skill 3/Ultimate và profile sát thương của hai thành phần Ultimate. Không tự cấp Authority từ Rank/Class. Chúng không chặn việc đồng bộ mô tả kit; tài liệu này không khẳng định đã hoàn tất một normalization mới của toàn bộ 00–08.
 

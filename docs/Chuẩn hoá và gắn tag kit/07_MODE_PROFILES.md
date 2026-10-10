@@ -1,6 +1,6 @@
 # ARCLUNE — MODE PROFILES
 ## Chặng H — Mode-Specific Runtime Profiles
-**Version:** 2026-10-10-H.4
+**Version:** 2026-10-10-H.5
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`, `06_KERNEL_RUNTIME.md`
 **Purpose:** define which runtime rules are active in each game mode without forking Character identity, Tag semantics, Primitive meanings, or Kernel foundations.
@@ -14,6 +14,8 @@
 **Revision H.3:** admits explicitly bound multi-part bodies and non-consuming real SSI pass contacts in Main. Player-selected Leader form restrictions use existing Action-form data; postmortem consumed waits and ordinary scheduling remain unchanged.
 
 **Revision H.4:** binds conditional River import and performed-Natural Side capture to existing Main initialization/completion/SSI gates; clarifies CC loss/Forced Basic negative space and historical entry versus ordinary deployment. No unrelated Mode or Authority/lifecycle foundation change.
+
+**Revision H.5:** every real Combat Instance keeps Reincarnation/Heavenly ALWAYS_RESIDENT and River CONDITIONAL_IMPORT. Main binds finite Heavenly Natural-start checks before State expiry/start settlements (latest designer answer), CC and Action; non-Natural modes require explicit cadence/scheduling rather than disabling laws or inventing seconds. Existing other Mode semantics remain.
 
 # 0. MODE PROFILE PRINCIPLE
 
@@ -111,16 +113,7 @@ The following remain global/canonical and are not duplicated per mode:
 - Capability Index model;
 - Execution Trace model.
 
-A mode may disable use of a system without redefining it.
-
-Example:
-
-> Exploration/Defense currently disables Luân Hồi.
-
-That does not mean `REINCARNATION` has a different semantic there.
-
-It means:
-> the mode lifecycle profile does not activate that subsystem.
+Optional subsystems may have Mode feature flags. World residency is a separate explicit foundation policy under INS-003: WORLD_AXIOM_REINCARNATION and HEAVENLY_THUNDER_IMPARTIALITY ALWAYS_RESIDENT in every real Combat Instance; RIVER_OF_LIGHT_AND_SHADOW CONDITIONAL_IMPORT by normalized dependency/access. No Mode flag can disable the two resident world laws. Missing cadence/scheduling adapter is REQUIRED_EXPLICIT, not absence of the Axiom. Axiomatic Traits DIVINE_NATURE/UNIQUENESS are explicit identity metadata, not World-system flags.
 
 ---
 
@@ -609,6 +602,20 @@ Normal effects do not automatically use progression adjudication.
 
 ---
 
+# 18A. TURN-BASED WORLD AXIOM FOUNDATION
+
+TURN_BASED_MAIN binds WORLD_AXIOM_REINCARNATION and HEAVENLY_THUNDER_IMPARTIALITY ALWAYS_RESIDENT in its Combat Instance; RIVER_OF_LIGHT_AND_SHADOW uses §19's conditional dependency/import. Character/Identity DIVINE_NATURE/UNIQUENESS metadata is not World registration. Rank never grants access or Traits; World interaction never promotes Ability Authority.
+
+At the beginning of each real owner Natural opportunity, run INS-003's mandatory Heavenly observation on one coherent view before Character opportunity-start work, CC/form choice or Action admission. If violation, one fixed20%currentMaxHP strike → mandatory HP_ZERO/prevention/death/world bookkeeping → revalidate same granted owner. Only still alive/legal owner continues the opportunity under existing laws. A grant consumed by CC still has this check. A death/invalidated actor creates no actual Action/completion/class gain/River snapshot merely because an opportunity was granted; SSI consumed-opportunity/boundary law remains governing. No extra opportunity from the strike.
+
+ACT-034 personal start graphs/normal duration work use their existing checkpoints after this mandatory world start observation; a relevant committed mutation they cause also feeds INS-003's own stable mutation check. This does not create global ordering among unrelated Character start graphs. Multiple predicate/start reasons of the same authoritative checkpoint dedup to one strike. Non-Natural Forced/Follow-up/Counter/Reaction, POSTMORTEM_WAIT and pass contacts do not create the periodic checkpoint.
+
+Eligible entry/reentry and committed tracked-stat/MaxRage/True-Self-binding mutations also run finite stable checks after atomic commit. No Field→no periodic strike; reentry violating→immediate strike. Baseline/count retain per True Self × instance or unbound actor/life × instance. The stat profile must resolve tracked metadata/static basis; no Character-specific switch or body refresh.
+
+Reincarnation death order/base threshold/contributions/cohorts/route contention remain REC-governed; no bound True Self never enters Waiting. No eligible route at actual entry defaults to True-Self encounter exit, not a new Character lottery. Lineage previous-life basis is owned by the Reincarnation ledger without River. Unique claim retains through leave/death/waiting/Revive; Deck card acquires only on successful materialization, blocked deploy keeps its slot without reroll.
+
+---
+
 # 19. TURN-BASED HISTORY PROFILE
 
 TURN_BASED_MAIN binds RIVER_OF_LIGHT_AND_SHADOW as CONDITIONAL_IMPORT under HIS-001, not automatic residence. After resolving participant/Deck/definition profiles at setup, import normalized dependencies before gameplay and capture immutable baseline; no dependent content means no River. First dynamic dependency imports/baselines at its checkpoint only. Imported provider persists until instance end, independently of time Character death/leave.
@@ -905,23 +912,15 @@ Exact scheduler remains unresolved.
 
 ---
 
-# 35. EXPLORATION LIFECYCLE
+# 35. EXPLORATION WORLD AXIOM / LIFECYCLE ADAPTER
 
-Current explicit rule:
+For every real Combat Instance, WORLD_AXIOM_REINCARNATION and HEAVENLY_THUNDER_IMPARTIALITY remain ALWAYS_RESIDENT. RIVER_OF_LIGHT_AND_SHADOW imports only by its normalized dependency/access. Do not preserve the superseded “No Luân Hồi” rule or disable the world death-order ledger/routing merely because this Mode lacks SSI.
 
-> **No Luân Hồi in this mode.**
+Shared eligibility/True-Self binding, Death Cohort/waiting bookkeeping and materialization/mutation checkpoints remain meaningful where the Mode uses the same semantic commits. No bound True Self never enters Waiting. Existing death-order threshold is not a waiting wall-clock. Unsupported Mode-specific life/recovery/route scheduling must declare a supported adapter before that content executes; do not invent automatic respawn or new Character materialization.
 
-Therefore lifecycle profile disables:
-- Reincarnation Waiting;
-- Reincarnation routing;
-- death-order ledger.
+Heavenly static subject/baseline/count and relevant materialization/mutation observations use the shared INS-003 profile. The Main periodic “each owner Natural opportunity start” has no implicit real-time equivalent. For a non-Natural-Action scheduler, periodic cadence = REQUIRED_EXPLICIT MODE ADAPTER; not seconds, attacks, frames or disabled World law. The unresolved adapter does not block the Main foundation.
 
-It may still use:
-- HP;
-- death;
-- removal;
-- revive if a future mode-specific ability explicitly supports it;
-but current exact death/revive design remains unresolved.
+Exact Exploration recovery/fail/injury/respawn and unsupported additional scheduling remain unresolved independently from World residency. No silent transfer of SSI, turn-based kit or resource tables.
 
 ---
 
@@ -1350,18 +1349,23 @@ A Mode Profile should expose explicit subsystem activation.
 Conceptual:
 features:
   ssi: true | false
-  trueSelf: true | false
-  reincarnation: true | false
+  trueSelfBindingProfile: <explicit supported identity profile>
+  reincarnationSchedulingAdapter: <shared death-order or REQUIRED_EXPLICIT>
+  worldAxioms:
+    WORLD_AXIOM_REINCARNATION: ALWAYS_RESIDENT
+    HEAVENLY_THUNDER_IMPARTIALITY: ALWAYS_RESIDENT
+    RIVER_OF_LIGHT_AND_SHADOW: CONDITIONAL_IMPORT
+  heavenlyPeriodicAdapter: OWNER_NATURAL_OPPORTUNITY_START | REQUIRED_EXPLICIT
   revive: true | false | mode_defined
   authority: full | reduced | disabled
   narrative: enabled | disabled | mode_defined
-  historySnapshots: enabled | disabled
+  historySnapshots: <conditional provider dependency/capture profile, not a global resident toggle>
   continuousMovement: true | false
   roomSystem: true | false
   localEconomy: true | false
   structures: true | false
   deckDeployment: true | false | mode_defined
-Feature flags are not Tags.
+Feature flags are not Tags. Optional-subsystem/ordinary-kit Authority flags cannot disable locked World residency or erase AXIOM Trait clauses; reduced/disabled kit adjudication still needs a supported Mode binding for any actual foundational conflict.
 deckDeployment indicates whether the Mode exposes Deck → Battlefield deployment as an active subsystem.
 Current direction:
 TURN_BASED_MAIN: enabled;
@@ -1561,8 +1565,8 @@ Ability references:
 `NATURAL_ACTION_OF_TARGET`
 inside a mode with no SSI/Natural Actions.
 
-### Reincarnation in mode with lifecycle disabled
-unless Ability explicitly invokes a separate supported system.
+### Missing required World scheduling/profile adapter
+Reject affected executable content when its clock/route/lifecycle operation lacks a supported adapter. Luân Hồi/Thiên Lôi residency itself cannot be disabled, and no second Reincarnation system is a fallback.
 
 ### Slot target in continuous spatial mode
 unless adapter maps it intentionally.
@@ -1658,7 +1662,7 @@ Do not assume turn-based full kit capability if Story exists in another mode.
 
 Turn-based currently enables full Authority system.
 
-Exploration Authority behavior is unresolved.
+Exploration ordinary-kit Authority behavior is unresolved. This cannot disable mandatory World-law clauses, change their tiers or bypass actual AXIOM conflicts; unsupported System adjudication profiles remain REQUIRED_EXPLICIT.
 
 Options later:
 - full Authority retained;
@@ -1681,9 +1685,10 @@ Turn-based:
 - Revive;
 - Luân Hồi.
 
-Exploration:
-- no Luân Hồi;
-- fail/injury/respawn semantics unresolved.
+Exploration real Combat Instance:
+- Luân Hồi/Thiên Lôi resident; shared bound-True-Self death/bookkeeping and stable mutation/materialization laws apply;
+- unsupported scheduling/Heavenly periodic cadence is REQUIRED_EXPLICIT;
+- fail/injury/respawn semantics remain unresolved.
 
 Same death event can feed different lifecycle profiles.
 
@@ -1884,7 +1889,7 @@ Still unresolved:
 - stage failure on Explorer NPC death?
 - Base destruction failure?
 
-No Luân Hồi does not answer these questions.
+World residency does not answer these additional Mode recovery/failure questions; it cannot be switched off to avoid specifying their adapters.
 
 ---
 
@@ -2060,7 +2065,7 @@ A model understands Arena if:
 A model understands Exploration/Defense if:
 
 1. no SSI.
-2. no Luân Hồi.
+2. Luân Hồi/Thiên Lôi ALWAYS_RESIDENT in real Combat Instances, with unsupported non-Natural scheduling/cadence REQUIRED_EXPLICIT.
 3. direct Explorer NPC control is core current direction.
 4. roster Characters are recruited during run from owned roster.
 5. Rooms are large spatial regions, not slots.
@@ -2088,7 +2093,7 @@ This file passes Chặng H if:
 - [x] Character identity remains shared.
 - [x] Ability variants can differ per mode.
 - [x] turn-based keeps SSI/Luân Hồi.
-- [x] Exploration explicitly disables SSI/Luân Hồi.
+- [x] Exploration has no SSI; Luân Hồi/Thiên Lôi residency remains, missing adapter semantics are explicit.
 - [x] Arena is modeled as Combat Instance profile.
 - [x] shared Tags/Primitives keep same meaning.
 - [x] continuous and slot spatial models use adapters.
@@ -2176,10 +2181,11 @@ Canonical direction:
                            │
                            ▼
                    Shared Semantic Kernel
+             Damage / State / Lifecycle / World profiles
                    /                   \
                   /                     \
        Turn-Based Adapter          Exploration Adapter
-      SSI / Slots / Luân Hồi     Real-time / Rooms / Economy
+            SSI / Slots          Real-time / Rooms / Economy
                  \
                   \
                Arena Child Combat Instance
