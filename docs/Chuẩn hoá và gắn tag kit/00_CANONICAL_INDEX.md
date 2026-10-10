@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-10-INDEX-32
+**Version:** 2026-10-10-INDEX-33
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -60,7 +60,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-10-10-INDEX-32`
+**Version:** `2026-10-10-INDEX-33`
 **Read:** after root `AGENTS.md`.
 
 ## `00_CANONICAL_RECOVERY_AUDIT-1.md`
@@ -71,7 +71,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`
 **Role:** Chặng B — canonical meanings and semantic distinctions.  
-**Version:** `2026-10-09-B.4`.
+**Version:** `2026-10-10-B.5`.
 **Read when:** gần như mọi normalization task.  
 **Important:** `TURN_BOUNDARY` là global SSI boundary theo CLK-001, gồm ngoại lệ POSTMORTEM_WAIT được khai báo tường minh. Personal windows dùng Actor Natural Action Window / Natural Action clocks; explicitly boundary-timed work có thể qualify original consumed Natural-opportunity owner của chính global boundary (CC loss vẫn qualifies), không tạo private boundary; dead wait không tiến personal Actor clock.
 
@@ -89,7 +89,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `04_ABILITY_SCHEMA-1.md`
 **Role:** Chặng E — declarative Character/Ability authoring schema + normalized IR boundary.  
-**Version:** `2026-10-10-E.23`.
+**Version:** `2026-10-10-E.24`.
 **Read when:** chuẩn hóa kit.  
 **Important architecture:**
 
@@ -104,7 +104,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `05_CONTRACTS.md`
 **Role:** Chặng F — exact timing/order/snapshot/authority/lifecycle rules.  
-**Version:** `2026-10-10-F.25`.
+**Version:** `2026-10-10-F.26`.
 **Read when:** mechanic phụ thuộc timing, conflict, snapshot, damage, death, revive, reincarnation, authority, child action, materialization.
 
 **Important maintenance note:** nếu bản local vẫn còn §59/§61 cũ, phải dùng corrected checklist hiện hành; các vấn đề sau **đã resolved** và không còn được liệt kê là unresolved:
@@ -122,18 +122,18 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `06_KERNEL_RUNTIME.md`
 **Role:** Chặng G — deterministic runtime architecture.  
-**Version:** `2026-10-10-G.24`
+**Version:** `2026-10-10-G.25`
 **Read when:** kiểm tra liệu mechanic có cần subsystem/runtime state mới.  
 **Important:** no ordinary `switch(characterId)` special-case.
 
 ## `07_MODE_PROFILES.md`
 **Role:** Chặng H — mode-specific scheduler/spatial/lifecycle/resource profiles.  
-**Version:** `2026-10-08-H.3`
+**Version:** `2026-10-10-H.4`
 **Read when:** mechanic khác nhau theo turn-based / Arena / Exploration-Defense.
 
 ## `08_STRESS_TESTS.md`
 **Role:** Chặng I — reverse architecture validation.  
-**Version:** `2026-10-10-I.26`
+**Version:** `2026-10-10-I.27`
 **Read when:** architecture impact, hard kit normalization, pre-freeze validation.  
 **Important:** some tests pass by rejecting invalid data or preserving unresolved contracts.
 
@@ -142,6 +142,8 @@ Authored Character data không nên tham chiếu raw engine code.
 ## 2A. Current Character canon navigation
 
 In `docs/canon kit/`:
+
+- **Lậu Khắc Ma Chủ** → `docs/canon kit/Lau_Khac_Ma_Chu_Clarified_Gameplay_Canon.md` R1 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. Raw #6 replaced; source-owned cap5 Sa, one-opportunity Time Stop/two-opportunity immunity, common-snapshot replacement palms, once-per-root Ultimate RNG, excluded-resource allied History Restore/receipt-backed50% deployment refund and seeded Forced Basics locked. Reuses River/Snapshot/HIS/History Runtime; E.24/F.26/G.25/H.4 bind bounded profiles, I.27 M-198–M-207 cover the boundaries. No new Tag/Primitive or Character-specific History service; Thuận Lưu locks per-member ordinary Reaction chain terminal before next-Actor revalidation; numeric metadata/active Bar cap/future Mode adapters remain nonblocking.
 
 - **Diệp Lâm / Ye Lin** → `docs/canon kit/Diep_Lam_Clarified_Gameplay_Canon.md` R1 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. A.3 raw fully replaced; exact-source infinite Law seeds/target decay, capped battle MaxHP growth/separate Heal, retained-until-death form, per-hit recipient conversion, tied-maximum Slot palms and snapshot explosion/Leader Ultimate are locked. E.23/F.25/G.24 add only a bounded fraction-to-TRUE operation to the existing component transform; I.26 M-195–M-197 cover its conservation/read/overlap/replay boundaries and reuse earlier cases. `CONTENT_TBD — FEAR/BLEED EFFECT DEFINITIONS` remains the only secondary-content blocker. Adjacent global raw hierarchy remains legacy provenance. No new Tag/Primitive/Contract ID or executable implementation.
 
@@ -889,6 +891,16 @@ protection/immunity outside ordinary hit admission;
 Authority conflict.
 Authority-bearing special hit denial/avoidance remains subject to normal Authority adjudication.
 Pilot #1 therefore changed Schema / Contract / Kernel / Mode / Stress-Test coverage without introducing a new Functional Tag or Primitive.
+
+---
+
+# 19B. WORLD HISTORY PROVIDER — CONDITIONAL FOUNDATION
+
+`RIVER_OF_LIGHT_AND_SHADOW` is a shared World-Axiom History provider imported only by normalized participant/Deck/definition dependency, before gameplay or at dynamic first-import checkpoint. Immutable baseline starts there; import persists until Combat Instance end. `HISTORY_RECORD_SCOPE ≠ HISTORY_RESTORE_SCOPE`; current Side profile captures only actually performed allied Natural roots after blocking work/ACTION_COMPLETED and before SSI continues.
+
+Ownership: 01§15.5 meaning; existing 03 P-002/P-120/P-003 capture/record/restore; 04§§13.6–13.8 dependency/profile/selection/bounded transaction/refund/cohort; 05 HIS-001–004/ACT-041 law; existing 06§§115–117 History/Transaction/Deck Result/Action execution; 07§19 Main binding; 08 M-198–M-207 stress. `docs/định nghĩa về axiom.md` Quang Ảnh section is corrected to the same scope. No second provider or Character-owned History manager.
+
+SIDE_BATTLE_STATE_NON_RESOURCE never restores Side AE or any actor Rage, including caster; current values remain exact. RNG/Reincarnation/True-Self/new-life identity and direct Deployment Cost Bar restoration are excluded. Deployment rollback refund is separately authored from exact committed receipt, not snapshot Bar. Historical state changes carry HISTORY_RESTORE cause, never ordinary Heal/Revive/Return/deploy triggers. Unsupported other temporal profiles require actual explicit law; no blanket full-state/RNG/Event rewind permission.
 
 ---
 

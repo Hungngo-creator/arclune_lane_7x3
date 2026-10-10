@@ -1,6 +1,6 @@
 # ARCLUNE — TERMINOLOGY vNext
 ## Canonical Combat, Runtime & System Terminology
-**Version:** 2026-10-09-B.4
+**Version:** 2026-10-10-B.5
 **Stage:** Chặng B — Terminology Reconstruction  
 **Source basis:** `terminology.md` + `00_CANONICAL_RECOVERY_AUDIT.md` + các correction hiện hành của user được Audit ghi nhận.  
 **Scope:** định nghĩa nghĩa canonical của khái niệm. File này **không** phải Tag Registry, Primitive Registry, Ability Schema, Contract hay Kernel implementation.
@@ -14,6 +14,8 @@
 **Revision B.3:** separates a multi-part physical/scheduling body from its one lifecycle/resource owner, and an actual SSI pass contact from a consumed opportunity. Existing entity kinds, Action identity and clocks remain unchanged.
 
 **Revision B.4:** distinguishes explicitly qualified consumed-owner global-boundary provenance from a new/private boundary or ordinary personal-window clock. No new term/ID; CC-lost opportunity remains distinct from performed Action.
+
+**Revision B.5:** corrects existing River terminology: conditional provider/import baseline, profile-driven Mốc and record/restore distinction with non-restorable resources under the bounded Side profile. No new Functional Tag or runtime law is defined here.
 
 # 0. MỤC ĐÍCH VÀ QUY TẮC ĐỌC
 
@@ -3223,21 +3225,13 @@ Exact effect semantics thuộc character/system file riêng.
 **ID:** `RIVER_OF_LIGHT_AND_SHADOW`  
 **Status:** SYSTEM-SPECIFIC / CANONICAL CORE
 
-World Axiom ghi snapshot battlefield sau complete Action và hỗ trợ time-regression mechanics.
+World-Axiom History provider, **CONDITIONAL_IMPORT** theo normalized participant/Deck/definition dependency; không mặc định resident trong mọi Combat Instance. Lậu Khắc có access, không sở hữu provider. Axiom identity không cấp AXIOM Authority cho toàn bộ kit.
 
-Snapshot có thể chứa:
-- Position;
-- HP/Max HP;
-- Rage;
-- AE/resource;
-- stats;
-- Buff/Debuff/Mark;
-- cooldown;
-- deck/field/dead state;
-- Summon;
-- lifecycle state.
+**Quang Ảnh** là historical observation immutable; **Mốc Quang Ảnh** là checkpoint committed trong timeline của provider. **BASELINE** là snapshot tại first import; dynamic import không có lịch sử trước đó. Checkpoints sau baseline do capture profile quyết định. Natural Action opportunity bị CC mất ≠ actually performed Natural Action; current Side access chỉ ghi root Natural thực hiện/hoàn tất, không checkpoint riêng cho non-Natural/child/hit/tick.
 
-Full-field regression ≠ single-entity regression.
+**HISTORY_RECORD_SCOPE ≠ HISTORY_RESTORE_SCOPE.** Record có thể chứa membership/Position, HP/MaxHP, stats/contributions, Shield ledger, State/counter/duration/cooldown/form/battle state, AE/Rage/other resources và source/provenance. Recorded field không tự cấp quyền restore.
+
+Full Combat Instance regression ≠ Side-scoped regression ≠ single-entity regression. **SIDE_SCOPED_HISTORY_RESTORE** là thay đổi eligible historical state trong một Side theo bounded profile, không đồng nghĩa ordinary Heal/Cleanse/Revive/Return/deploy. **OBSERVABLE_ONLY / NON_RESTORABLE** là field được quan sát nhưng không được mutation qua regression. Với SIDE_BATTLE_STATE_NON_RESOURCE, AE/Rage giữ chính xác giá trị hiện tại; RNG, Reincarnation ledger/progress, True-Self/new-life identity và direct Deployment Cost Bar không được restore. Paid-deployment partial refund là authored settlement từ committed receipt, không copy snapshot Bar. Timing/selection/atomicity/exclusions cụ thể thuộc HIS Contracts, không suy từ tên Axiom.
 
 ---
 

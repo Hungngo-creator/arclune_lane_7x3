@@ -586,82 +586,160 @@ GHI CHÚ HỆ THỐNG:
 Bộ kit này đảm bảo Ngao Bính yếu ở đầu trận (do phải hóa trứng mất lượt) nhưng là một Thần Hủy Diệt không thể ngăn cản ở cuối trận.
 
 
-6)  [PRIME] LẬU KHẮC MA CHỦ (Lou Ke Ma Zhu)
- * Class: Mage / Controller.
- * Vũ khí: [Lậu Khắc Ma Sa] (Đồng Hồ Cát Đen).
-1. NỘI TẠI: Lậu Ấn Trói Thời
- * Tags: [Nội Tại], [Gắn Dấu Ấn], [Cộng Dồn], [Quy Tắc: Ngưng Thời], [Không Thể Tẩy Xóa].
- * Logic:
-   * Cơ chế Sa Ấn (Sand Mark):
-     * Trigger: Mỗi lần gây sát thương (Đánh thường / Skill 1 / Skill 3).
-     * Effect: Gắn 1 Sa Ấn lên mục tiêu. (Nếu đang có Buff Skill 2 thì gắn 2 Sa Ấn).
-     * Tính chất: Sa Ấn tồn tại vĩnh viễn cho đến khi bị kích hoạt hoặc thanh tẩy (bởi skill xóa dấu ấn). Tối đa 5 stack.
-   * Quy Tắc Ngưng Thời (Time Stop Rule):
-     * Check: Khi mục tiêu đạt 5 Sa Ấn.
-     * Result:
-       * Reset Sa Ấn về 0.
-       * Mục tiêu nhận trạng thái [Ngưng Thời] (Time Stop).
-       * Bỏ qua hoàn toàn lượt hành động kế tiếp (Skip Turn).
-       Sau khi hiệu ứng "Bỏ qua lượt" kết thúc, mục tiêu nhận trạng thái [Thời Gian Miễn Nhiễm] trong 2 Lượt. Trong trạng thái này, mục tiêu không thể bị gắn Sa Ấn.
-     * Quy Tắc: Đây là hiệu ứng cấp Thần. Không thể bị kháng bởi chỉ số RES hay miễn nhiễm khống chế thông thường. (Chỉ có Thần Tính khác mới có thể tương tác).
-2. ĐÁNH THƯỜNG: Thời Sa Kích
- * Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Gắn Dấu Ấn].
- * Logic:
-   * Gây sát thương = 100% (WIL + ATK).
-   * Gắn +1 Sa Ấn.
-3. KỸ NĂNG 1: Hắc Sa Song Chưởng
- * Logic:
-   * Cost: 25 Aether.
-   * Hành động: Tung 2 chưởng vào 2 Kẻ Địch Ngẫu Nhiên.
-   * Sát thương: Mỗi chưởng gây 100% Sát Thương Đánh Thường.
-   * Hiệu ứng: Mỗi chưởng gắn +1 Sa Ấn (Tổng 2 Sa Ấn rải ra sân).
-4. KỸ NĂNG 2: Trùng Ấn Lậu Khắc
- * Tags: [Chủ Động], [Bản Thân], [Buff: Cường Hóa Dấu Ấn], [Tiêu Hao: Aether].
- * Logic:
-   * Cost: 25 Aether.
-   * Hiệu ứng: Trong 3 Turn kế tiếp.
-   * Cường hóa: Mọi đòn đánh/kỹ năng của hắn sẽ áp dụng 2 Sa Ấn thay vì 1. (Giúp kích hoạt Nội tại Ngưng Thời cực nhanh).
-5. KỸ NĂNG 3: Tam Luân Tán Chưởng
- * Tags: [Chủ Động], [Đa Mục Tiêu: Ngẫu Nhiên], [Sát Thương Hỗn Hợp], [Gắn Dấu Ấn], [Tiêu Hao: Aether].
- * Logic:
-   * Cost: 35 Aether.
-   * Hành động: Tung 3 chưởng vào 3 Kẻ Địch Ngẫu Nhiên.
-   * Sát thương: Mỗi chưởng gây 100% Sát Thương Đánh Thường.
-   * Hiệu ứng: Mỗi chưởng gắn +1 Sa Ấn (Tổng 3 Sa Ấn).
-   * Combo: Nếu đang bật Skill 2 -> Tổng cộng rải 6 Sa Ấn ra sân (Mỗi hit 2 ấn). Kẻ nào xui bị trúng 2-3 phát là bị Ngưng Thời ngay lập tức.
-6. ULTIMATE: Thiên Mệnh Lậu Khắc Ma Kinh
- * Logic:
-   * Trigger: Đầy Nộ (Auto-cast).
-   * Cơ chế RNG: Tỷ lệ 50% ra Nghịch Lưu hoặc Thuận Lưu.
-   * Trường hợp A: [Quy Tắc: Nghịch Lưu] (Time Reversal):
-     * Tác động: Chỉ ảnh hưởng lên PHE ĐỒNG MINH.
-     * Hành động: Load lại trạng thái (Snapshot) của toàn đội tại thời điểm Kết thúc lượt trước đó.
-     * Chi tiết:
-       * HP/Aether: Quay về giá trị cũ. (Hồi máu nếu bị mất, mất máu nếu vừa được hồi).
-       * Buff/Debuff: Quay về trạng thái cũ. (Xóa debuff mới nhận, lấy lại buff đã mất).
-       * Vị trí: Quay về ô cũ.
-       * Tử Vong: Đơn vị chết trong lượt hiện tại -> Sống lại (với HP của lượt trước).
-       * Triệu Hồi: Đơn vị vừa được triệu hồi từ tay (Hand) ra sân trong lượt này -> Quay về Deck, hoàn trả Cost.
-       [LƯU Ý QUAN TRỌNG]: Hiệu ứng này KHÔNG hồi phục thanh Nộ (Aether/Rage) của đồng minh (Nộ giữ nguyên mức hiện tại sau khi đã tiêu hao).
-   * Trường hợp B: [Quy Tắc: Thuận Lưu] (Time Acceleration):
-     * Tác động: Toàn bộ Đồng Minh.
-     * Hành động: Cấp cho mỗi đồng minh 1 Lượt Hành Động Phụ (Extra Action) ngay lập tức.
-     * Chi tiết: Tất cả đồng minh thực hiện 1 Đòn Đánh Thường vào kẻ địch (Theo logic chọn mục tiêu mặc định).
-GHI CHÚ HỆ THỐNG (SYSTEM NOTES):
- * Quy Tắc Ngưng Thời vs Kháng Hiệu Ứng:
-   * Kẻ địch có chỉ số RES 100%? -> Vẫn bị Ngưng Thời.
-   * Kẻ địch có skill Miễn nhiễm Choáng? -> Vẫn bị Ngưng Thời.
-   * Kẻ địch là Prime (có Thần Tính)? -> Hai Quy Tắc va chạm. Thần Tính thường miễn nhiễm mọi hiệu ứng xấu. Vậy Prime địch sẽ KHÔNG bị Ngưng Thời, nhưng vẫn bị gắn Sa Ấn (như một bộ đếm vô hại).
- * Xử lý Nghịch Lưu (Revert State):
-   * Đây là ác mộng của Coder nếu không có hệ thống Snapshot.
-   * Cần lưu trữ trạng thái End_Of_Turn_State của phe ta sau mỗi lượt.
-   * Khi Ult kích hoạt Nghịch Lưu: ApplyState(Current_Team, End_Of_Turn_State).
-   * Lưu ý: Sa Ấn trên người Địch không bị ảnh hưởng (vì Ult chỉ tác động phe ta). Kẻ địch vẫn giữ nguyên lượng máu đã mất trong lượt này (Lợi thế cực lớn: Ta hồi phục, Địch vẫn bị thương).
- * Combo Hủy Diệt:
-   * Bật Skill 2 (+1 Ấn).
-   * Dùng Skill 3 (3 tia x 2 Ấn = 6 Ấn).
-   * Kết quả: Ngẫu nhiên khóa mõm (Skip turn) 1-3 kẻ địch ngay lập tức. Đây là một con bài Control cực kỳ lỗi.
-   
+# 6) [PRIME] LẬU KHẮC MA CHỦ
+
+Class: Mage
+
+Vũ khí: Lậu Khắc Ma Sa — Đồng Hồ Cát Đen.
+
+## Nội tại — Lậu Ấn Trói Thời
+
+Mỗi direct Damage hit hợp lệ từ:
+- Đánh Thường;
+- Skill 1;
+- Skill 3
+
+áp dụng Sa Ấn lên recipient.
+
+Bình thường:
+1 Sa Ấn / hit.
+
+Khi Skill 2 active:
+2 Sa Ấn / hit.
+
+Sa Ấn:
+- source-owned;
+- cap5;
+- Authority Tier = QUY_TẮC;
+- tồn tại cho tới khi bị consume/remove/lifecycle cleanup;
+- không thể được áp lên target có Prime + Thần Tính.
+
+Khi source-family Sa Ấn đạt5:
+
+→ consume/reset toàn bộ family về0
+→ target nhận Ngưng Thời.
+
+Ngưng Thời:
+
+→ consume hoàn toàn Natural Action opportunity kế tiếp của target;
+→ không Basic/Skill/Ultimate;
+→ SSI opportunity vẫn advance;
+→ Turn Boundary vẫn xảy ra.
+
+Sau opportunity bị Ngưng Thời:
+
+→ apply Thời Gian Miễn Nhiễm trong 2 Natural Action opportunity tiếp theo của chính target.
+
+Trong Thời Gian Miễn Nhiễm:
+target không thể nhận Sa Ấn.
+
+## Đánh Thường — Thời Sa Kích
+
+Một hit:
+
+Physical =100% ATK
+Will =100% WIL.
+
+Sau successful hit:
+apply Sa Ấn theo Nội tại.
+
+## Skill 1 — Hắc Sa Song Chưởng
+
+Cost: 25 AE.
+
+Hai chưởng resolve sequentially.
+
+Mỗi chưởng:
+- seeded random legal enemy;
+- selection independent, WITH REPLACEMENT;
+- target bằng Slot theo default attack law;
+- gây:
+  Physical100% ATK
+  +
+  Will100% WIL;
+- apply Sa Ấn.
+
+Cùng target có thể bị chọn hai lần.
+
+## Skill 2 — Trùng Ấn Lậu Khắc
+
+Cost: 25 AE.
+
+Cần một Natural Action để activate.
+
+Trong 3 Natural Action opportunity tiếp theo của Lậu Khắc:
+
+mọi qualifying hit của Basic/Skill1/Skill3 apply2 Sa Ấn thay vì1.
+
+Activation Action không count.
+
+CC-lost opportunity count.
+
+Non-Natural Action không giảm duration.
+
+State không stack.
+
+Recast:
+refresh về3.
+
+## Skill 3 — Tam Luân Tán Chưởng
+
+Cost: 35 AE.
+
+Ba chưởng resolve sequentially.
+
+Mỗi chưởng:
+- seeded random legal enemy;
+- independent selection WITH REPLACEMENT;
+- Slot-target default;
+- Physical100% ATK + Will100% WIL;
+- apply Sa Ấn.
+
+Một target có thể bị trúng 1/2/3 lần.
+
+Skill2 active:
+2 Sa Ấn mỗi hit.
+
+## Ultimate — Thiên Mệnh Lậu Khắc Ma Kinh
+
+Successful Ultimate root:
+
+seeded RNG đúng một lần:
+
+50% Nghịch Lưu
+50% Thuận Lưu.
+
+### Nghịch Lưu
+
+Dùng Quang Ảnh Chi Hà.
+
+Chỉ hồi quy phe đồng minh Lậu Khắc.
+
+Chọn latest committed Side Mốc Quang Ảnh STRICTLY BEFORE current Ultimate Natural Action.
+
+Nếu chưa có previous Natural snapshot:
+dùng BASELINE.
+
+Restore eligible allied state theo History Restore profile.
+
+KHÔNG restore:
+- AE;
+- Rage;
+- RNG;
+- Luân Hồi;
+- Side Deployment Cost Bar trực tiếp.
+
+### Thuận Lưu
+
+Tạo cho mỗi eligible allied battlefield Actor đúng một:
+
+BASIC_ATTACK
++ FORCED_ACTION
++ NON_NATURAL.
+
+Không tạo SSI Natural opportunity mới.
+
+
 
 7) 
 [UR] HUYẾT BỘC – PHỆ (Shi) Class: Mage

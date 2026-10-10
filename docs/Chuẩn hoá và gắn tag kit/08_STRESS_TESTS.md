@@ -1,6 +1,6 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-10-I.26
+**Version:** 2026-10-10-I.27
 **Status:** Working Canonical Validation Suite  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md` B.4+, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.23+, `05_CONTRACTS.md` F.25+, `06_KERNEL_RUNTIME.md` G.24+, `07_MODE_PROFILES.md` H.2+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
@@ -53,6 +53,8 @@
 **Revision I.25:** adds M-184–M-194 for admitted-hit stack/control/cause composition and the four bounded E.22/F.24/G.23 extensions: Hit probability, all-Damage receive, safe removal input and finite once-per-Presence packages. Prior fixtures/IDs remain unchanged. Package fixtures are synthetic architecture data, never authored Dream pool content. Declarative Architecture Phase obligations only; no executable tests are asserted.
 
 **Revision I.26:** adds only M-195–M-197 for conserved fraction-to-TRUE splitting, actual-recipient/source-family phase reads with sequential State settlement, and overlap/provenance/replay rejection. Diệp Lâm's other mechanics reuse existing cases/Contracts with explicit Canon validation fixtures. Earlier case bodies/IDs remain unchanged; no guessed Fear/Bleed behavior or executable test results.
+
+**Revision I.27:** adds M-198–M-207 for conditional River lifecycle/capture, strict pre-Action selection, observed-versus-restorable AE/Rage hard exclusion, same-life/atomic layout, receipt-backed partial refund, created-entity History cause, Sa/CC/opportunity clocks, replacement palms and finite Forced Basics/Ultimate replay. Rejection controls cover unsupported rollback/profile writes; all previous case bodies/IDs remain unchanged. Declarative Architecture Phase obligations, not executed runtime tests.
 
 # 0. WHAT THIS FILE IS
 
@@ -4857,6 +4859,102 @@ Zero-missing-HP after intervening lawful recovery gives E0: ordinary zero-delta/
 **Replay/rejection controls:** prepared hit stores checkpoint recipient/life, source-family/read values, R, original/derived refs and eventual terminal receipts; resume does not reread changed N or resplit committed segments. Sealed receipt consumers see resulting types exactly once. Missing/foreign/stale family/snapshot/Action provenance, selection-time N replacing current phase read, unknown overlap, recursive callbacks or incompatible hashes reject affected executable content. Fear/Bleed definitions remain CONTENT_TBD; no behavior is synthesized to pass a test.
 **Layers Under Test:** §18B/DMG-007/§45A, TRG-013/014, existing State/Action/Snapshot/Result/Transaction and deterministic replay; preserves M-147 whole-transform controls and M-154 pinned profiles.
 
+## M-198 — Conditional World-History Import and Lifetime
+
+**ID:** `M-198`
+**Status:** `MUST_PASS`
+**Purpose:** distinguish shared World-Axiom scope from universal residence and Character ownership.
+**Fixture/input:** Combat A has no normalized River dependency. B has one Lậu Khắc in Deck. C acquires its first River-dependent capability at committed checkpoint c20 after several Natural Actions. D has two dependent definitions with overlapping registration/replay; its accessing time Character later dies/leaves.
+**Expected Resolution:** A allocates no River/timeline/baseline. B imports one provider during setup before gameplay, baseline at initialized state without requiring Field presence. C baseline begins exactly at c20; no markers for c1–c19. D reuses one Combat-instance provider and immutable import baseline; repeated initialization/capability publication does not duplicate it. Source death/leave cannot destroy imported history. Provider terminates at instance end under normal in-flight/replay retention. Import VFX delayed/omitted/reordered changes no Kernel checkpoint.
+**Forbidden:** resident River in A, source-owned history, fabricated early history, baseline reset by second owner, delayed gameplay import waiting for animation.
+**Layers Under Test:** 00/01/System metadata, Schema, P-002/P-120, HIS-001, Kernel, Main.
+
+## M-199 — Performed-Natural Capture, Root Blocking Work and Strict Selection
+
+**ID:** `M-199`
+**Status:** `MUST_PASS`
+**Fixture/input:** allied Natural N1 completes two palms, a blocking real child, required lifecycle/outcome and root-linked settlement; later CC-lost opportunity N2 has no Action. A Follow-up/Counter/Reaction/Forced Basic and standalone State tick occur. Enemy Natural E1 completes. Allied Ultimate U starts with Side's latest marker S1 from N1. Variant: U is the first allied performed Natural after import.
+**Expected Resolution:** one S1 after N1's full resulting state/ACTION_COMPLETED, before SSI continuation, including all blocking work; a later ordinary post-completion Heal/State mutation cannot contaminate the pinned completion view. No child/hit/tick/non-Natural or CC-only checkpoint. Enemy marker, if its access profile permits one, cannot replace allied S1. U selects S1 strictly before U's Natural start; first-Natural variant uses retained baseline. No capture midway through U or its History read; only after U/its blocking work completes may its result produce a new Side marker. Exact completion redelivery/save-resume appends once. Existing Mode-hook dependency law is preserved, not a new global Reaction ordering.
+**Forbidden:** snapshot per complete child, CC creates ACTION_COMPLETED, latest enemy/current-Action/global marker, capture-before-required-outcome, U overwrites its own input, baseline evicted while selectable.
+**Layers Under Test:** Snapshot, ACT-031/032, HIS-001/003, Kernel handoff, Main.
+
+## M-200 — Historical Observation Does Not Restore AE/Rage or Emit Ordinary Effects
+
+**ID:** `M-200`
+**Status:** `MUST_PASS`
+**Fixture/input:** snapshot S records allied AE80, caster Rage100, ally X Rage70, enemy Rage50; eligible allied HP100/MaxHP120, Shield30 with two source contributions, Buff/Mark/duration/cooldown/Position. At restore barrier after Ultimate payment: allied AE25, caster Rage0, X Rage20, enemy Rage80; current HP40/MaxHP90/Shield5/new Debuff/new Position. Restore S via SIDE_BATTLE_STATE_NON_RESOURCE. Controls reverse resource direction (snapshot AE5/Rage0, current AE90/caster Rage60/X Rage95); a same-life waiting Actor has retained current Rage13; RNG cursor is45 although observation refers to earlier cursor12. Enemy HP/State/Sa/Position/resources have changed since S.
+**Expected Resolution:** eligible allied HP/MaxHP/State/Shield ledger/Position reconstruct S once, with contribution provenance and no final-stat-plus-modifier double application. Current AE and **every Actor/provider's** Rage remain exact in both high/low snapshot variants, caster included; waiting Actor retains13. Enemy HP/State/Sa/Position/resources remain exactly pre-restore. RNG stays45. No ordinary Damage/Heal/Overheal/HP Loss/Cleanse/Buff apply/Debuff apply/Revive/Return/deploy receipts/events or corresponding triggers. Explicit HISTORY_RESTORE observer may receive one transaction cause. Current Action Costs/gains and historical trace/events remain committed.
+**Negative controls:** restore plan requesting AE/Rage SET/delta/refund, RNG copy or State/Max-Rage-derived clamp must be rejected before mutation. Recording those fields is valid and never grants restore scope. No Field entry initializes/fills Rage or class AE.
+**Forbidden:** resource refund/loss, transient forbidden write later compensated, indirect cap clamp, copied enemy attachment cleanup, ordinary Heal from restored HP, rewind seed, retroactive un-emission.
+**Layers Under Test:** record/restore scope, Schema validation, P-003, HIS-002/004, Transaction/Resource/State owners.
+
+## M-201 — Same-life Waiting Restore, Entered-Reincarnation Barrier and Atomic Layout
+
+**ID:** `M-201`
+**Status:** `MUST_PASS`
+**Fixture/input:** S has allied A life1 alive in Slot1, B life1 alive in Slot2 and C in Deck. Current A life1 is DEATH_CONFIRMED/Waiting/not entered, laterDeathCount2; B life1 has ENTERED_REINCARNATION and new life2 occupies Slot2. C was deployed post-S into Slot1. World ledger/death order/progress contains these real commits. Permute entity/list/Slot iteration. Control: B remains Waiting instead, and desired snapshot has both A/B on Field.
+**Expected Resolution:** derive layout first, stage rewindable C out, restore A same life into Slot1 and return C to Deck under its receipt rule. A's active waiting eligibility reconciles with alive state without ON_REVIVE/identity allocation/ledger counter rewind or deletion of original death history. B old-life branch fails locally; new life2 is excluded from post-snapshot-created removal and stays Slot2 and neither its Rage nor True Self identity changes. Other eligible allied branches continue. Waiting-B control restores both old lives atomically regardless of processing order. Preserve global Reincarnation progress/order and future eligibility laws; snapshot never resets them. No half-occupied/Deck+Field state visible.
+**Forbidden:** restore old entered life, displace/erase new life, extract Chân Ngã, reset counts, iteration winner, implicit fallback Slot, global fail solely due to B's local ineligibility.
+**Layers Under Test:** HIS-003, current REC/identity law, occupancy/presence/Deck/Transaction.
+
+## M-202 — Deployment Rollback Uses Exact Receipt, Half-floor, Cap and Single Payout
+
+**ID:** `M-202`
+**Status:** `MUST_PASS`
+**Fixture/input:** S has roster X in Deck and Bar28. X now Field from paid post-S DEPLOY_FROM_DECK receipt actual15, while Base cost20 and Current cost9. Current Bar10; synthetic active cap30. Nghịch Lưu undoes that exact Presence. Controls actual receipts14/9/7/1; Bar29/cap30; receipt amount differs after a later cost mutation; zero/unpaid summon; previously undone Presence redelivered; X really redeployed with a distinct paid receipt.
+**Expected Resolution:** return X to Deck with HISTORY_RESTORE cause and refund7 from actual15, yielding current Bar17, independent of S's28/Base20/Current9. Other receipts refund7/4/3/0. Bar29 variant requests7 but gains1 to30 and discards6. Receipt/state/refund-consumed identity commit together. No ordinary RETURN_TO_DECK observer fires; explicitly opted HISTORY_RESTORE observer can. Replay/another delivery of already undone Presence adds0 again. A later actual redeployment has its own receipt and eligibility; no invented nominal refund. The synthetic cap30 supplies fixture input, not global Mode cap canon.
+**Negative controls:** missing/foreign/noncommitted receipt, unsupported cap or snapshot-Bar SET plan rejects affected preparation before partial return/refund. Paid receipt refers to exact current post-snapshot Presence and owning participant/Side/checkpoint; a past payment alone does not qualify a newly created entity.
+**Forbidden:** copy Bar28 then add7, refund15/full cost, round15 to8, read Current9 as payment, duplicate payout, AE grant, refund detached summon or ordinary Return trigger.
+**Layers Under Test:** HIS-003, DEP-001 receipt retention, Schema/Result Store/Transaction/Mode cap interface.
+
+## M-203 — Post-snapshot Entity Removal Is History Reconciliation, Not Death
+
+**ID:** `M-203`
+**Status:** `MUST_PASS`
+**Fixture/input:** after S an allied Summon Q and unpaid runtime actor R were created, both absent in S; enemy Summon Z likewise created. Current effects listen for DEATH_CONFIRMED, summon death, ordinary Return and HISTORY_RESTORE. Controls Q existed in S, or R is actually a paid roster deployment with a valid receipt under M-202.
+**Expected Resolution:** Q/R absent-at-S post-created branches are removed with HISTORY_RESTORE, without Death context/DEATH_CONFIRMED, summon-death trigger, Reincarnation advancement, ordinary Return or automatic refund. Enemy Z remains unchanged. Existing-at-S Q follows eligible historical state scope, not the post-created removal branch. Paid-roster control uses only M-202's receipt-backed refund. Attached/index cleanup retains History cause and does not masquerade as ordinary expiry/death.
+**Forbidden:** kill-to-remove, new qualifying death, default summon refund, deleting enemy Z, source-leave cleanup deleting enemy Sa.
+**Layers Under Test:** creation/presence identity, P-003, HIS-003/004, Lifecycle/State/Transaction.
+
+## M-204 — Independent Sa Families, Admitted Hits and No-overflow Threshold
+
+**ID:** `M-204`
+**Status:** `MUST_PASS`
+**Fixture/input:** Lậu Khắc owners A/B have separate families on target T life1: A4/B3. A active Skill2 committed direct mixed hit is fully Shield-absorbed, so ActualHP0 and grant2. Controls MISS, rejected hit, invalid recipient, target Prime+Thần Tính, TIME_STOP or TIME_IMMUNITY; Damage alone may remain legal. A later dies/leaves; T later transitions old life/new life.
+**Expected Resolution:** admitted successful direct mixed hit grants once, A4+2 clamps5, one threshold/reset0 and one Ngưng Thời attempt; B remains3. No overflow1. Full Shield absorb does not deny grant; MISS/rejection/invalid recipient grants0. Prime+Thần Tính receives permitted Damage but no Sa, with no AUT attempt to bypass the explicit restriction. TIME_STOP/IMMUNITY admits no additional Sa. A death/leave retains its already attached enemy Sa; target old-life cleanup deletes only that life's families. Real foreign conflict uses current QUY_TAC/AUT law; neither Prime Rank nor provider dependency grants extra tier. Duplicate grant/result delivery cannot repeat threshold.
+**Forbidden:** shared-owner stacks, one mark per PHYSICAL/WILL component, ActualHP>0 gate, uncleanseable inference, new-life inheritance, source leave purges enemy, Authority-as-Functional-Tag.
+**Layers Under Test:** existing State family/Result/Hit/Damage/Snapshot/DAG, AUT, lifecycle.
+
+## M-205 — Time Stop/Immunity and Skill2 Use Consumed Opportunity Clocks
+
+**ID:** `M-205`
+**Status:** `MUST_PASS`
+**Fixture/input:** T receives Ngưng Thời before opportunity t1. t2 is CC-lost for another reason, t3 performs a Basic; between them are non-Natural actions and foreign Actor opportunities. A activates Skill2 in own Natural a1, then a2 performed, a3 CC-lost, a4 performed; non-Natural Basic occurs while active. Recast control refreshes in a3 instead of CC loss.
+**Expected Resolution:** t1 consumes exactly one Natural opportunity, no Basic/Skill/Ultimate/Action-generated AE/Rage/History marker, but pointer/global boundary advance. Immunity begins after t1, blocks Sa throughout t2/t3 and expires after t3; t1 itself is not one of the two. Foreign/non-Natural work does not tick. Skill2 a1 excluded, active through a2/a3/a4 including CC-lost a3, then expires; qualifying non-Natural Basic while active gets2 without decrementing duration. Recast is nonstacking refresh3 with new activation opportunity excluded. Exact consumed-grant keys/clock revision prevent duplicate decrement or an old expiry retiring a refreshed State. Early State removal is not automatically the consumed-Time-Stop follow-on cause.
+**Forbidden:** Actor-private Turn Boundary, lost opportunity executes Action, CC doesn't count duration, activation counts, all-completed-Action clock, Forced Basic shortens immunity/Skill2, stacked recast.
+**Layers Under Test:** existing State/Duration/DAG, ACT-012/015, CLK, Main History profile.
+
+## M-206 — Sequential Replacement Palms Retain One Post-Cost Source Snapshot
+
+**ID:** `M-206`
+**Status:** `MUST_PASS`
+**Fixture/input:** source ATK100/WIL60 after successful required Skill1 AE25 or Skill3 AE35 payment. Seeded legal pool permits the same target across all palms. After palm1 required settlement changes source ATK/WIL to200/120, changes target legality and may move/empty a selected Slot through explicitly valid mandatory work. Each palm has its own target decision/Hit result. Skill2 active control uses grant2.
+**Expected Resolution:** one source snapshot after successful Cost; each palm formula remains PHYSICAL100 + WILL60 regardless of later source stat changes. Skill1 can select T twice; Skill3 T one/two/three times by independent WITH REPLACEMENT decisions if still legal. Each palm re-evaluates legal selection at its own selection point, locks Slot, resolves mandatory lifecycle/Sa before next. Empty/invalid bound Slot at impact locally fails, with no replacement coordinate/query. No ordinary Reaction window between palms. Failed Cost has no palm/snapshot-dependent effect; MISS grants no Sa. Replay retains common source data and per-palm seeded decisions/terminal results, never redraws committed selections. Two Damage components are one hit/grant.
+**Forbidden:** distinct-target-only pool, common locked target set, per-palm source restat, silent retarget, Counter between internal palms, six independent hits from three mixed palms, unpaid effects.
+**Layers Under Test:** Cost/SNP, TGT-008/Hit, RES-003, State settlement/RNG/Result.
+
+## M-207 — Ultimate Branch Replay and Finite Seeded Forced Basic Cohort
+
+**ID:** `M-207`
+**Status:** `MUST_PASS`
+**Fixture/input:** successful Ultimate U has one seeded50/50 draw. The latest designer-locked cohort profile selects RES-003 AFTER_EACH_MEMBER_ACTION_REACTIONS_TERMINAL. Thuận Lưu eligible cohort includes caster Character A, Leader B and executable-Basic Summon C; anchored object D has no executable Basic. A Basic commits, then its ordinary Counter/Reaction chain kills B, creates actor E and changes C's stats/Position; all three changes occur after A completion and before next-member revalidation. Permute initial list/Slot/entityId/Event order while preserving semantic actor/draw bindings. Save/resume before/after branch and between children. Nghịch Lưu control uses M-199–M-203.
+**Expected Resolution:** one immutable branch per successful root; restored RNG never supplies reroll. Thuận Lưu freezes {A,B,C}, excludes D, uses one seeded enumeration-invariant permutation and requests each valid member exactly once as BASIC_ATTACK/FORCED_ACTION/DOES_NOT_CONSUME_NATURAL_ACTION. Example pinned order A→B→C: A closes lifecycle/blocking/Action completion, then its exact ordinary Counter/Reaction chain reaches terminal; only then B is revalidated and skips/no replacement. C resolves its own now-current Basic snapshot/target after the Reaction mutations, and E is never added. Reaction cannot reorder the frozen A→B→C permutation. Basic-only observer including A's qualifying Sa can see identity. No child SSI advance/Natural opportunity, Natural AE/Rage, Natural duration tick or own History checkpoint; the completed Natural U root may capture once. Ordinary Counter/Reaction belongs to the exact completed member and drains to terminal between members, including currently due causal descendants; sibling/root/foreign work is not released merely by shared root ID. This local release creates no global priority/default and must not wait until cohort end. Replay at A-completed/pending-Counter/Counter-terminal/B-skip resumes that same chain/cursor, never starts B/C early, reruns A/Counter or rerolls branch/order. Previously authored AFTER_DIRECT_EFFECTS_COMPLETE cohorts/palms retain their own gate; incompatible outer gates/observable ungoverned Reaction competition reject rather than use Event/list order. Same normalized profile under different Character definitions uses identical generic owners.
+**Negative controls:** missing dependency/snapshot/start anchor/exclusion coverage/receipt, attempted AE/Rage/RNG/ledger/identity/Bar copy, Slot/list priority, NON_NATURAL omission, omitted/unsupported observable Reaction boundary, arbitrary rollback callbacks or Character-specific History dispatcher must reject before affected gameplay. Distinct Basic profile Damage copied inside Skill does not satisfy executable real-Basic identity.
+**Forbidden:** Extra Natural Actions, FORCE label without Basic identity, held Counter kills B only after B acts, reordering/inserting E, own child checkpoint, redraw from replay, source-owned LauKhacHistoryManager/LauKhacSnapshot/LauKhacRollbackService, insertion-order priority.
+**Layers Under Test:** existing P-001, Action/Target/Effect graph, ACT-041/RES-003/HIS, RNG, replay/validation/meta boundary.
+
+---
+
 # 18. TEST GROUP N — SYNTHETIC CROSS-SYSTEM TORTURE TESTS
 
 ---
@@ -5670,13 +5768,13 @@ Current suite defines:
 - 7 Mode tests;
 - 14 anti-scripting/validation tests;
 - 7 unresolved Contract probes;
-- 197 character-derived integration tests;
+- 207 character-derived integration tests;
 - 9 cross-system torture tests;
 - 5 meta-tests.
 
 Total named test cases:
 
-328 tests / probes / meta-tests (323 A–N cases plus 5 META cases)
+338 tests / probes / meta-tests (333 A–N cases plus 5 META cases)
 
 The count is not a design target.
 

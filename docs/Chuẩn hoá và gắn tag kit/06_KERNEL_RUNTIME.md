@@ -1,6 +1,6 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-10-10-G.24
+**Version:** 2026-10-10-G.25
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
@@ -49,6 +49,8 @@
 **Revision G.23:** consumes E.22/F.24 through existing State/Hit/Target, Damage/modifier/Shield/Transaction, Scheduler input and Definition/Trigger/RNG/Effect owners. Exact State/window/request/presence/package refs retain finite work and replay terminals; no Character branch, new service, callback or global priority.
 
 **Revision G.24:** extends only §45A's existing transform plan to conserved fraction-to-TRUE segments, phase-local recipient/family reads and original-component receipt provenance under DMG-007. Existing Damage/Contract/Result/Transaction owners suffice; no Character branch, manager, callback or new mutable subsystem.
+
+**Revision G.25:** extends existing HistoryState/Snapshot/Transaction/Deck Result/Action owners for conditional provider import, immutable baseline/profile capture, bounded excluded-resource Side restore, occupancy reconciliation, deployment payment receipts and finite seeded Forced Basics. AE/Rage/ledger/RNG remain exact current values; no second History subsystem or Character runtime.
 
 # 0. EXECUTIVE ARCHITECTURE
 
@@ -4742,45 +4744,56 @@ No temporary double ownership.
 
 # 115. HISTORY RUNTIME
 
-Quang Ảnh Chi Hà maintains ordered snapshots after complete Actions.
+The existing Snapshot / History Runtime owns one optional provider per Combat Instance × RIVER_OF_LIGHT_AND_SHADOW. HistoryState stores import checkpoint/state version, immutable baselineRef, Side access/capture profiles, recorded-field whitelist/provenance, ordered committed markers and processed capture identities. Import is idempotent from normalized setup dependencies (including Deck) or a later committed capability checkpoint; no dependency creates no provider. Dynamic first import creates baseline at that checkpoint only. Source death/leave retires source-specific future capability registration under its law, not the already imported provider/timeline. Provider terminates at instance cleanup; retain selected/in-flight refs and replay evidence through their normal horizon.
 
-Conceptual:
-
-```text
-historySequence
-rootActionId
-actionId
-combatStateVersion
-snapshotRef
-```
-
----
-
-# 116. ACTION-COMPLETE HISTORY TIMING
-
-History snapshot records only committed state after the Action reaches its canonical completion point.
-
-It does not record animation frame state.
-
----
-
-# 117. REGRESSION
-
-Regression runtime:
+Baseline uses P-002 and no fake Action. P-120 marker metadata includes:
 
 ```text
-load SnapshotRef
-→ validate regression scope
-→ build restore transaction
-→ resolve identity/lifecycle restrictions
-→ commit selected fields
+provider / Combat Instance / Side / captureProfileRef
+historySequence / captureCheckpoint / combatStateVersion
+rootActionId / actionId / snapshotRef
 ```
 
-It does not automatically:
-- rewind RNG;
-- delete trace;
-- un-send prior Events;
-unless future time Contract says so.
+historySequence orders committed historical records for selection/trace; it supplies no Action/Reaction priority. Immutable Snapshot fields may observe AE/Rage without making them writable restore operands. No Character-name key, second manager or parallel timeline.
+
+# 116. PROFILE-DRIVEN HISTORY TIMING
+
+At the existing Action completion/required handoff gate, evaluate imported capture profiles against exact performed-Natural root/Side/completion evidence. Wait for root blocking children/outcomes/settlements; after ACTION_COMPLETED, append one immutable committed view before SSI continuation. Capture pins the root-completion committed version before ordinary post-completion observer/settlement mutations; appending that immutable view is not a live resnapshot after an arbitrary observer order. Preserve existing declared post-completion Mode-hook dependency law. Reject a forged Action completion for CC-only opportunity loss. Non-Natural and child/hit/tick completion produces no marker under this profile, even sharing rootActionId. Resume/double completion checks the exact capture key before appending. Presentation cannot gate capture.
+
+At current Natural root start retain its authoritative start-checkpoint anchor. Snapshot selection reads only already committed eligible Side markers with capture strictly earlier than that anchor; otherwise baseline. Freeze selected SnapshotRef/coverage. The executing Ultimate is still open and cannot generate/replace its own input. Required root completion then captures resulting state for future consumers normally.
+
+# 117. BOUNDED REGRESSION TRANSACTION
+
+The existing Transaction Manager interprets 04§13.7/HIS-001–004 via P-003; History Runtime supplies immutable data, not arbitrary inverse deltas.
+
+```text
+load/freeze SnapshotRef + typed scope/profile
+→ protect current Side/life/ledger/occupancy/resource/receipt view
+→ validate coverage and exclusion write set
+→ derive desired allied layout + local-ineligible branches
+→ stage removals/restores/refund and reconcile contributions
+→ validate final layout and exact excluded-value invariants
+→ one authoritative eligible-side commit + terminal Result
+→ expose HISTORY_RESTORE evidence
+```
+
+Preserve current Side AE and Rage of **every** Actor/provider, including dead/waiting same-life owners and caster after Ultimate Cost. Do not load snapshot values as resource proposals, calculate their deltas, reset/fill on Field entry, or allow restored Max/cap/contribution changes to clamp them. Incompatible derived writes fail validation before commit; restore has no AE/Rage mutation operand. Bar is excluded from copy, with only explicit receipt-backed refund addition permitted. RNG cursor and World Reincarnation ledger/progress/True-Self/new-life identities remain current. No resource or lifecycle init routine is called by historical presence reconstruction.
+
+Same-life waiting restoration checks the current world ledger under the protected view before building a branch. Restore active battle state/waiting eligibility coherently without copying ledger counters, deleting death history or creating a new life. Entered-Reincarnation old life is terminally ineligible; skip its branch, preserve new-life occupant/identity and continue others. Never invoke ordinary Revive or ON_REVIVE. Historical State/contribution reconstruction rebuilds admitted allied indexes once, not final stats plus duplicated modifiers; retain source/provenance and exclude out-of-scope enemy attachments/writes.
+
+Layout planning precedes writes. Stage out eligible post-snapshot rewindable occupants; protected new-life occupants are not staged out. Occupancy/presence/Deck/life/State writes commit together with no half-state or technical-order winner. Conflict not governed by the supported profile rejects preparation rather than displacing by iteration. Eligible created-after-snapshot allied entities absent in the record retire under HISTORY_RESTORE; protected non-rewindable Reincarnation results are excluded from that removal, no Death context, summon-death or default refund.
+
+### Deployment receipt integration in existing Deck/Result owners
+
+At ordinary successful deployment (§10A), retain immutable receipt linked to owning battle participant/Side, committed transaction checkpoint, resulting Presence and actual debited deploymentPaymentAmount. This stores the existing payment result; it never changes DEP-001's authoritative Current-cost validation/payment. Failed attempts create no successful receipt. Retain receipt until no legal History selection/rollback can need it, and keep terminal dedup evidence through replay horizon.
+
+For snapshot-Deck/current-post-snapshot paid Presence, History preparation resolves that **exact** receipt. Stage Deck return and FLOOR50% addition to current Bar under resolved active cap; commit undone-Presence/receipt identity and payout result together. Missing/foreign/unpaid/already-undone receipt cannot fund payout. Zero/clipped addition is terminal once; a later genuine paid redeployment has a new Presence/receipt. Never read snapshot Bar/Base/Current cost or call ordinary RETURN_TO_DECK/deploy/Full-Rage initialization. Entity removal alone cannot synthesize a receipt.
+
+### Existing Action owner: finite Forced Basic cohort
+
+04§13.8 uses the existing Target/Action/Effect DAG and RNG service: freeze eligible battlefield actors/executable Basics, bind one enumeration-invariant seeded permutation, then P-001 requests one BASIC_ATTACK/FORCED_ACTION/non-Natural member at a time. Persist cohort/order/cursor/accepted ActionRefs and terminal results. Revalidate member before request; invalid skips without replacement. Each member's own Basic targeting/snapshot/admission and complete blocking/lifecycle settlement precedes next member. For AFTER_EACH_MEMBER_ACTION_REACTIONS_TERMINAL, after each independent member closes lifecycle/blocking/Action completion, open the existing scoped gate for its exact currently due causal ordinary Counter/Reaction chain. Settle that chain to terminal before next-member revalidation. Member Action/cause evidence selects the scope; shared root alone cannot drain sibling/root/foreign work. Persist member completion, release scope, Reaction identities/terminal cursor. Reactions cannot reorder/add/replace the frozen cohort; they may invalidate a later member which then skips. No root-wide hold until cohort end. Existing differently authored Reaction gates remain unchanged; incompatible observable contention/foreign gates or missing boundary fail closed without invented priority. No SSI opportunity, class-Natural resources, Natural timer or child History capture. Exact Basic identity remains visible to qualifying Basic mechanics.
+
+Restore transaction identity is originating Effect-execution/Action + provider/Side/profile, not a new identity allocated on each retry. Persist selected input, exclusion guards, planned/failed branches, payout receipts and terminal result; technical abort emits no partial writes. Replay restores pending progress or reuses committed result, never re-emits ordinary historical events or rerolls Ultimate/cohort. RNG/history/trace serialization for technical save/resume is distinct from gameplay regression permission. Unsupported full-instance/entity temporal profiles still require their actual explicit Contract; this bounded profile does not grant them causality rules.
 
 ---
 
@@ -6557,7 +6570,7 @@ A correct Arclune Kernel must support all of these without contradiction:
 42. World Axiom Luân Hồi can observe Arena deaths.
 43. Narrative Belief ≠ Stability.
 44. Capability Index preserves source contributions.
-45. Quang Ảnh history is based on authoritative Action completion.
+45. Imported Quang Ảnh history uses immutable baseline and explicit capture profiles; current Side access captures only actually performed Natural roots after authoritative completion. Recorded fields do not grant restore permission; AE/Rage are non-restorable under SIDE_BATTLE_STATE_NON_RESOURCE.
 46. Kernel determinism never justifies inventing missing gameplay semantics.
 47. unresolved Contract branches fail visibly rather than guessing.
 48. no ordinary mechanic requires Character-specific engine code.

@@ -1,6 +1,6 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-10-10-F.25
+**Version:** 2026-10-10-F.26
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
@@ -48,6 +48,8 @@
 **Revision F.24:** governs bounded ordinary Hit probability multiplication, explicit all-Damage receive protection, safe queued exact-State removal and finite once-per-Presence package grants through existing HIT/DMG/RES/ACT/CLK/STA/POS laws. Reuses stack snapshots, hard-control opportunity consumption and terminal causes; no new Contract ID, Tag, Primitive, callback or global priority.
 
 **Revision F.25:** extends DMG-007 only with a conserved bounded fraction-to-TRUE mapping of resolved non-TRUE components. Existing scopes, phase views, hit/Shield/allocation, overlap rejection and whole-type behavior are preserved; no new Contract ID, Tag, Primitive or priority.
+
+**Revision F.26:** corrects existing HIS-001–004 with conditional import/baseline, profile capture, recorded-versus-restorable scope, bounded Side restore, hard AE/Rage/RNG/Reincarnation exclusions and exact paid-deployment partial refund/cause/replay law. Extends existing ACT-041/RES-003 with finite seeded Forced Basic cohort law and explicit per-member causal Reaction terminal release, preserving prior profiles. No new Contract ID, Tag or Primitive.
 
 # 0. IMPORTANT STATUS MODEL
 
@@ -2254,6 +2256,25 @@ Mandatory lifecycle evaluation still occurs between components.
 Target invalidation continues to follow `TGT-006`.
 
 ---
+
+### Explicit finite Action-cohort Reaction boundary
+
+04§13.8 may select **AFTER_EACH_MEMBER_ACTION_REACTIONS_TERMINAL** for a finite sequential cohort of independent Actions:
+
+```text
+member Action i
+→ mandatory lifecycle
+→ blocking settlements
+→ ACTION_COMPLETED / existing Action-terminal processing
+→ release ordinary Counter/Reaction causally belonging to that exact member
+→ settle that currently due causal Reaction chain to terminal
+→ revalidate frozen member i+1
+→ next member Action
+```
+
+This local profile releases member-owned ordinary work before the enclosing cohort direct sequence completes; it does not hold it until cohort end. Cohort membership/permutation remain frozen: Reactions may mutate validity/stats/targets, never reorder/add/replace members. A now-invalid next member skips. Current member identity plus existing validated Event/Action causality binds this release; rootActionId equality alone cannot include siblings, the enclosing root or unrelated queued work. Include currently due causally generated Counter/Reaction descendants under existing recursion/terminal guards; do not await future delayed Actions, future Natural opportunities or unrelated queues.
+
+Use the existing scoped RES-003 Reaction gate, Trigger/Action queue and local completion dependencies. This profile supplies release timing, not priority among competing Reactions. Their actual applicable Contracts still govern order; unsupported observable contention/conflicting enclosing foreign gates must reject or remain REQUIRED_EXPLICIT, never use list/Event order. Unprofiled sequential Effects and AFTER_DIRECT_EFFECTS_COMPLETE retain their laws. It is not a global multi-Action Reaction default. Save/resume retains member terminal ref, causal release scope, queued/terminal Reaction identities and release cursor; it cannot advance next member before the chain closes, re-release a terminal chain or duplicate a Counter.
 
 ### No new global default
 
@@ -5313,6 +5334,8 @@ This allows conditions to separately query:
 
 Ký Ức Skill 3 explicitly excludes Forced Basic from its 3-Natural-Basic sequence.
 
+04§13.8 freezes allied battlefield-valid actors with executable Basics at execution, including any eligible Character/Leader/Summon. One seeded enumeration-invariant permutation orders the finite cohort. Each member receives one real BASIC_ATTACK/FORCED_ACTION/DOES_NOT_CONSUME_NATURAL_ACTION, resolves fully under its own Basic before next, and skips without replacement if invalid at request. No SSI opportunity/advance, class-Natural AE/Rage, Natural-duration tick or own History checkpoint. Basic-only mechanics may observe identity. For the explicitly selected AFTER_EACH_MEMBER_ACTION_REACTIONS_TERMINAL profile, each member is an independent Action: mandatory lifecycle/blocking settlement/Action completion → its ordinary Counter/Reaction causal chain terminal → revalidate next frozen member. No holding until cohort end, Reaction reorder or replacement. RES-003 defines the scoped release; independently authored AFTER_DIRECT_EFFECTS_COMPLETE profiles retain their law. Missing observable boundary remains REQUIRED_EXPLICIT; no global default is created. Persist cohort/order/member ActionRefs/terminal cursor for replay; no Slot/entityId/list/Event priority or redraw.
+
 ---
 
 # 35. KÝ ỨC SPECIAL CONTRACTS
@@ -6241,50 +6264,68 @@ No blind clone.
 
 # 41. QUANG ẢNH CHI HÀ / HISTORY
 
-## HIS-001 — History Snapshot Timing
+## HIS-001 — Provider Import and Profile-driven Capture
 **Status:** `LOCKED`
 
-Quang Ảnh Chi Hà records a battlefield snapshot after every **complete Action** under its world law.
+RIVER_OF_LIGHT_AND_SHADOW is a World-Axiom History provider with CONDITIONAL_IMPORT, not a resident law in every Combat Instance. Resolve normalized participant/Deck/definition dependencies at instance initialization before gameplay. Import once if any dependency exists, even with the time Character only in Deck. A capability acquired dynamically imports at its authoritative checkpoint only; create immutable BASELINE then, never fabricated earlier history. Once imported, keep provider/baseline/timeline until instance end even if a source dies/leaves. Presentation import/VFX can observe the result but cannot delay or define Kernel import/capture timing.
 
-It records committed gameplay state, not animation frame.
+Capture is profile-driven. Current ALLIED_PERFORMED_NATURAL_COMPLETED Side access:
 
----
+```text
+actually performed eligible allied Natural root
+→ blocking child/outcome/settlement terminal
+→ ACTION_COMPLETED
+→ committed Side Mốc Quang Ảnh capture
+→ SSI continues
+```
 
-## HIS-002 — Snapshot Scope
-**Status:** `LOCKED CURRENT DIRECTION`
+P-002 captures immutable import baseline; P-120 records qualifying root markers. No marker for a CC-lost opportunity without an actual Action, non-Natural Forced/Follow-up/Counter/Reaction, individual child/hit/State tick. Required child work is already in the root resulting state. Pin the root-completion committed state view before ordinary post-completion observers/settlements can mutate it. This capture supplies no global priority among those observers/Reactions and does not move existing Mode post-completion hooks; their existing declared dependency checkpoints still govern. Capture binds one committed state version/root/Side/profile identity and is idempotent on replay.
 
-History snapshot may include:
-- Position;
-- HP/Max HP;
-- Rage;
-- AE;
-- stats;
-- statuses;
-- cooldown;
-- deck/field/dead state;
-- Summons;
-- life/death state.
-
-Exact serialization may evolve.
-
----
-
-## HIS-003 — Full vs Entity Regression
+## HIS-002 — Recorded Scope Is Not Restore Permission
 **Status:** `LOCKED`
 
-Full Combat Instance regression and single-entity regression are distinct operations.
+HISTORY_RECORD_SCOPE ≠ HISTORY_RESTORE_SCOPE. Profile observation may record battlefield/Deck/waiting membership, Position, CurrentHP/CurrentMaxHP, stat contributions/effective stats, Shield contribution ledger, Buff/Debuff/Mark, counters/stacks/durations, cooldown/form/Character battle state, Side AE, actor Rage/other resources and exact source/provenance. Records preserve one coherent committed view. Representation/serialization may evolve without expanding gameplay restore permission.
 
----
+SIDE_BATTLE_STATE_NON_RESOURCE authorizes only declared eligible allied battle fields. Its Side AE and every actor's Rage are OBSERVABLE_ONLY / NON_RESTORABLE, including caster and restored same-life Actors:
 
-## HIS-004 — Event History
-**Status:** `UNRESOLVED`
+```text
+AE_before_restore == AE_after_restore
+Rage_before_restore(actor) == Rage_after_restore(actor)
+```
 
-Restoring state does not automatically mean:
-- un-emitting old Events;
-- rewinding RNG streams;
-- deleting all trace history.
+“Before” is current authoritative state at the protected restore barrier, after already committed Action Costs. No snapshot SET, delta calculation, refund of Skill AE/Ultimate Rage, undo of resource gains, resource replay, restored-cap clamp or Field-entry/full-Rage initialization can violate this invariant. Preserve current resource provider identities/values for every Actor; observed historic values are read-only evidence.
 
-The project must explicitly define temporal causality semantics before time kits relying on this are implementation-final.
+RNG stream/cursor, Reincarnation ledger/progress/death order, True-Self/new-life identity and direct Deployment Cost Bar restoration are excluded. Restoring a State/stat contribution cannot hide an excluded resource/identity write. Snapshot presence of a field never grants restore access. Other resource behavior requires an actually supported explicit profile, not a blanket “resources restored” default.
+
+## HIS-003 — Scope, Selection and Restore Transaction
+**Status:** `LOCKED for bounded SIDE_SCOPED_HISTORY_RESTORE; other temporal profiles require explicit law`
+
+Full Combat Instance, Side-scoped and single-entity regression are distinct. 04§13.7 selects latest committed marker for the declared Side **strictly before current Natural root start**, or retained import BASELINE if no earlier Natural marker exists. Freeze SnapshotRef; current Ultimate cannot capture over the marker it reads. It may capture its resulting state for future roots after completion. Foreign/missing snapshot coverage fails visibly rather than using enemy/current/child markers.
+
+SIDE_SCOPED_HISTORY_RESTORE is one bounded typed transaction, not composed ordinary Heal/Cleanse/Revive/Return/deploy. Validate snapshot/profile/Side/life/ledger/receipt refs against one protected current view. Build eligible allied write set and desired snapshot occupancy first, stage out rewindable post-snapshot occupants, retain non-rewindable lives, then commit the eligible layout atomically. Internal iteration cannot decide Slot ownership. A non-rewindable Reincarnation result in an old-life destination makes that old-life branch fail locally; keep new life and continue other valid branches. Unknown conflicting layout requires explicit law/rejection, no fallback displacement/Slot.
+
+Same allied life DEATH_CONFIRMED and currently Waiting but not ENTERED_REINCARNATION may restore to an alive/on-Field snapshot. Reconcile current active waiting eligibility to that same alive life, retaining ledger/history/progress. No ON_REVIVE, new True Self, reset progress or synthetic qualifying death. Once old life ENTERED_REINCARNATION it cannot restore; never extract True Self, undo Reincarnation, erase new life or rewind death order/progress. Generic lifecycle/AUT restrictions remain actual eligibility inputs; no blanket Authority inference from provider identity.
+
+Eligible allied creations absent in snapshot and created afterward are removed with HISTORY_RESTORE reconciliation; protected non-rewindable Reincarnation results are excluded from this removal. Other eligible creations retire with this cause, not DEATH_CONFIRMED/summon-death. No refund unless eligible paid roster deployment below. Out-of-scope enemy HP/State/Sa/Position/resources remain unchanged; source-family reconciliation cannot remove enemy attachments just because their allied source's state restores.
+
+### Authored paid-deployment rollback refund
+
+For snapshot-Deck roster Character currently Field through a paid DEPLOY_FROM_DECK committed after snapshot, undo only that exact current Presence. Return to Deck under HISTORY_RESTORE. Join a separate authored partial refund:
+
+```text
+requestedRefund = floor(actualCommittedDeploymentCost ×0.50)
+15→7; 14→7; 9→4; 7→3; 1→0
+actualRefund = min(requestedRefund, active current Bar headroom)
+```
+
+Use immutable committed payment receipt linked to battle participant, Side, deployment transaction and Presence; no Base/Current/nominal cost substitution. Bar itself is never copied from snapshot; add to current Bar, clamp to active cap and discard overflow. Zero is valid; no snapshot restoration plus payout, repeated payout from same undone receipt or refund for unpaid created entity. Missing/incompatible receipt/cap data rejects affected preparation before partial mutation. Rollback Presence, refund, receipt consumption and terminal result share one barrier. History return is not ordinary RETURN_TO_DECK and fires no corresponding mechanic unless it explicitly observes HISTORY_RESTORE. This does not change ordinary DEP/Return policies or supply a universal numeric Bar cap.
+
+## HIS-004 — History Causes and Replay
+**Status:** `LOCKED for this bounded restore; unsupported future temporal causality remains REQUIRED_EXPLICIT`
+
+Historical field changes produce no ordinary Damage, Heal, Overheal, HP Loss, Cleanse, Buff/Debuff apply, Revive, Return-to-Deck or deploy receipt/Event/trigger merely because values changed. Use HISTORY_RESTORE cause/transaction evidence for explicitly opted-in observers. Historical HP restoration does not enter ordinary HP_ZERO/Damage/Heal pipelines; reconcile the eligible historical life/state coherently.
+
+No un-emitting prior Events, deleting trace, refunding past AE/Rage or rewinding RNG. Current seed cursor/index is unchanged by restore. Ultimate's already resolved one50/50 branch is immutable. Preserve original transaction/Effect execution, selected SnapshotRef, branch/cohort draws, eligible/local-failed branches, undone deployment receipts and terminal writes/results. Duplicate delivery/save-resume reuses them, never rerolls/reapplies/refunds twice. Baseline and legally selectable preceding marker must remain available; storage optimization cannot silently discard gameplay-required history. No arbitrary rollback VM or Character-specific History service.
 
 ---
 
